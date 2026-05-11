@@ -2,9 +2,9 @@ import { AppShell } from '../components/layout/AppShell'
 import { Star, Search } from 'lucide-react'
 
 const SUMMARY_TILES = [
-  { value: '890', label: 'in cohort', green: false },
-  { value: '87%', label: 'handoff triggered by CRM', green: false },
-  { value: '+60', label: 'avg agent FI signal (neutral)', green: true },
+  { value: '890', value2: '457', label: 'total customers', label2: 'responding to survey', green: false },
+  { value: '87%', label: 'had bot-to-human handoff', green: false },
+  { value: '+60', label: 'avg agent FI signal (positive)', green: true },
 ]
 
 const TABLE_ROWS = [
@@ -38,17 +38,37 @@ export function CohortPage({ onBack, onOpenInteraction }: { onBack: () => void; 
         {/* Page header */}
         <div>
           <h1 className="text-xl font-bold text-[#0F172A]">Call Transfer Impact — Cohort</h1>
-          <p className="text-[13px] text-[#64748B] mt-1">890 customers in this cluster · 433 didn't engage with the survey · Sorted by pattern relevance</p>
+          <p className="text-[13px] text-[#64748B] mt-1">890 total customers in this cohort</p>
+          <p className="text-[13px] text-[#64748B]">457 customers responded · 433 didn't engage with the survey · Sorted by pattern relevance</p>
         </div>
 
         {/* Section 1 — Summary Strip */}
         <div className="grid grid-cols-3 gap-4">
           {SUMMARY_TILES.map((tile, i) => (
             <div key={i} className="rounded-lg border border-[#E5E7EB] bg-white p-4">
-              <div className="text-2xl font-bold leading-none" style={{ color: tile.green ? '#16A34A' : '#0F172A' }}>{tile.value}</div>
-              <div className="text-[11px] text-[#64748B] mt-1">{tile.label}</div>
+              {i === 0 ? (
+                <>
+                  <div className="text-2xl font-bold leading-none text-[#0F172A]">{tile.value}</div>
+                  <div className="text-[11px] text-[#64748B] mt-1">{tile.label}</div>
+                  <div className="text-lg font-semibold leading-none text-[#0F172A] mt-2">{tile.value2}</div>
+                  <div className="text-[11px] text-[#64748B] mt-1">{tile.label2}</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-2xl font-bold leading-none" style={{ color: tile.green ? '#16A34A' : '#0F172A' }}>{tile.value}</div>
+                  <div className="text-[11px] text-[#64748B] mt-1">{tile.label}</div>
+                </>
+              )}
             </div>
           ))}
+        </div>
+
+        {/* Reconciliation line */}
+        <div className="rounded-lg border border-[#FDE68A] bg-[#FFFBEB] px-4 py-3">
+          <p className="text-[13px] text-[#92400E]">
+            <span className="font-semibold">This cohort is one segment</span> of the larger 1,343-customer drop detected on the dashboard.
+            The 890 customers here represent the Call Transfer Impact intent within that pattern.
+          </p>
         </div>
 
         {/* Section 2 — Featured Representative Case */}
@@ -69,7 +89,7 @@ export function CohortPage({ onBack, onOpenInteraction }: { onBack: () => void; 
               <div className="font-mono text-[13px] text-[#0F172A]">1c4fa089-d0c2-4157-ad35-b519bd0a2964</div>
               <div className="text-xs text-[#475569] mt-1">7/05/2026 · 8:21 PM · Voice · Retention Voice Q2</div>
               <div className="text-[13px] font-medium text-[#0F172A] mt-3">James Carter → Rachel Whitman (Retention Unit)</div>
-              <div className="text-xs text-[#475569] mt-3">Customer rating: 3/5 · Agent FI signal: +68 · Handoff: bot → human</div>
+              <div className="text-xs text-[#475569] mt-3">Customer rating: 3/5 · Agent FI signal: +68 (above cohort avg) · Handoff: bot → human</div>
             </div>
 
             {/* Right — customer comment */}
@@ -94,11 +114,14 @@ export function CohortPage({ onBack, onOpenInteraction }: { onBack: () => void; 
         {/* Section 3 — Cohort Table */}
         <div className="rounded-lg border border-[#E5E7EB] bg-white p-5">
           {/* Header */}
-          <div className="text-[15px] font-semibold text-[#0F172A]">Other cases in this cohort (889)</div>
+          <div className="text-[15px] font-semibold text-[#0F172A]">Other cases in this cohort (456)</div>
           <div className="text-xs text-[#64748B] mt-1">All matching the bot-to-human handoff friction pattern</div>
 
           {/* Filter row */}
           <div className="flex items-center gap-3 mt-3">
+            <button className="inline-flex items-center rounded-full border border-[#378ADD] bg-[#EFF6FF] px-3 py-1.5 text-xs font-medium text-[#1E40AF] hover:bg-[#DBEAFE]">
+              Show: Responding only
+            </button>
             <button className="inline-flex items-center rounded-full border border-[#CBD5E1] bg-white px-3 py-1.5 text-xs text-[#475569] hover:bg-[#F1F5F9]">
               Sort by: Pattern match ▾
             </button>
@@ -166,7 +189,7 @@ export function CohortPage({ onBack, onOpenInteraction }: { onBack: () => void; 
           {/* Footer */}
           <div className="flex items-center justify-between mt-4">
             <div className="flex items-center gap-2 text-xs text-[#64748B]">
-              <span>Showing 1-10 of 889</span>
+              <span>Showing 1-10 of 456</span>
               <button className="inline-flex items-center rounded-lg border border-[#CBD5E1] bg-white px-3 py-1.5 text-xs text-[#475569] hover:bg-[#F1F5F9] transition-colors">
                 load more
               </button>
