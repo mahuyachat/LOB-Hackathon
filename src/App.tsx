@@ -40,7 +40,7 @@ function PatternAlertBar({ onNavigate }: { onNavigate?: () => void }) {
         <Sparkles className="h-[18px] w-[18px] text-[#D97706] flex-shrink-0 mt-0.5" />
         <div>
           <div className="text-sm font-semibold text-[#92400E]">Pattern detected · 3 billing-flow intents trending together</div>
-          <div className="text-xs text-[#B45309] mt-0.5">3,520 interactions · ↑15% week-over-week</div>
+          <div className="text-xs text-[#B45309] mt-0.5">1,343 customers affected by handoff repetition · ↑15% week-over-week</div>
         </div>
       </div>
       <button
@@ -396,7 +396,7 @@ export default function App() {
           <StatCard
             title="Hidden Friction Rate"
             value="14%"
-            subtitle="Where the agent crushed it but rating drops"
+            subtitle="Low ratings the agent didn't earn"
             borderColor="#DC2626"
             alert={{ delta: '↑ +10pts vs prior 7 days' }}
           />

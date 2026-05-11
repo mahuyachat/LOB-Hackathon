@@ -4,7 +4,7 @@ import { Star, Search } from 'lucide-react'
 const SUMMARY_TILES = [
   { value: '890', label: 'in cohort', green: false },
   { value: '87%', label: 'handoff triggered by CRM', green: false },
-  { value: '+60', label: 'avg agent VU (positive)', green: true },
+  { value: '+60', label: 'avg agent FI signal (neutral)', green: true },
 ]
 
 const TABLE_ROWS = [
@@ -69,7 +69,7 @@ export function CohortPage({ onBack, onOpenInteraction }: { onBack: () => void; 
               <div className="font-mono text-[13px] text-[#0F172A]">1c4fa089-d0c2-4157-ad35-b519bd0a2964</div>
               <div className="text-xs text-[#475569] mt-1">7/05/2026 · 8:21 PM · Voice · Retention Voice Q2</div>
               <div className="text-[13px] font-medium text-[#0F172A] mt-3">James Carter → Rachel Whitman (Retention Unit)</div>
-              <div className="text-xs text-[#475569] mt-3">Customer rating: 3/5 · Agent VU: +68 · Handoff: bot → human</div>
+              <div className="text-xs text-[#475569] mt-3">Customer rating: 3/5 · Agent FI signal: +68 · Handoff: bot → human</div>
             </div>
 
             {/* Right — customer comment */}

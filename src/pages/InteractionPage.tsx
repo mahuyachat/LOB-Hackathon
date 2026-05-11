@@ -60,7 +60,7 @@ export function InteractionPage({ onBack, onBackToAnalysis }: { onBack: () => vo
             </div>
             <div className="rounded-md border border-[#FECACA] bg-white p-3.5 text-center">
               <div className="text-2xl font-bold text-[#16A34A]">+68</div>
-              <div className="text-[11px] text-[#64748B] mt-1">agent VU</div>
+              <div className="text-[11px] text-[#64748B] mt-1">agent FI signal</div>
             </div>
             <div className="rounded-md border border-[#FECACA] bg-white p-3.5 text-center">
               <div className="text-2xl font-bold text-[#DC2626]">-52</div>
@@ -147,7 +147,7 @@ export function InteractionPage({ onBack, onBackToAnalysis }: { onBack: () => vo
               <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#FEF3C7] text-sm font-semibold text-[#92400E]">4</div>
               <div>
                 <div className="text-sm font-semibold text-[#0F172A]">Outcome — Rating Mismatch</div>
-                <div className="mt-1 text-[13px] text-[#475569] leading-relaxed">Despite Rachel's clean resolution (+68 Agent VU), James rated 3/5. The friction signal points to <span className="font-bold text-[#0F172A]">the handoff — not the human agent's performance</span>.</div>
+                <div className="mt-1 text-[13px] text-[#475569] leading-relaxed">Despite Rachel's clean resolution (+68 agent FI signal), James rated 3/5. The friction signal points to <span className="font-bold text-[#0F172A]">the handoff — not the human agent's performance</span>.</div>
               </div>
             </div>
           </div>
