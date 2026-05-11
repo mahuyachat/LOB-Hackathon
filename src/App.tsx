@@ -393,7 +393,7 @@ export default function App() {
   }
 
   return (
-    <AppShell title="Dashboard" breadcrumb={['Screen Intelligence']}>
+    <AppShell title="Dashboard" breadcrumb={['Feedback Intelligence']}>
       <div className="p-6 bg-[#F8FAFC] flex-1 space-y-4">
         {/* Back to landing link */}
         <button onClick={() => setFlow('landing')} className="text-sm font-medium text-[#2563EB] hover:underline">

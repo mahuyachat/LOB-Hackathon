@@ -6,7 +6,7 @@ export function TopBar() {
       {/* Left: logo + app name */}
       <div className="flex items-center gap-2">
         <img src="/blue_smile.svg" alt="Logo" className="h-5 w-5 flex-shrink-0" />
-        <span className="text-sm font-medium text-foreground">Screen Intelligence</span>
+        <span className="text-sm font-medium text-foreground">Feedback Intelligence</span>
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
       </div>
 

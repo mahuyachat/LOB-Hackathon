@@ -22,7 +22,7 @@ const VALIDATED_FEEDBACK = [
 
 export function InteractionPage({ onBack, onBackToAnalysis }: { onBack: () => void; onBackToAnalysis: () => void }) {
   return (
-    <AppShell title="Interaction" breadcrumb={['Screen Intelligence', 'Dashboard', 'Analysis', 'Cohort']}>
+    <AppShell title="Interaction" breadcrumb={['Feedback Intelligence', 'Dashboard', 'Analysis', 'Cohort']}>
       <div className="p-5 bg-[#F8FAFC] space-y-5">
         {/* Back link */}
         <button onClick={onBack} className="text-sm font-medium text-[#2563EB] hover:underline">

@@ -12,7 +12,7 @@ interface AppShellProps {
   breadcrumb?: string[]
 }
 
-export function AppShell({ children, title = 'Dashboard', breadcrumb = ['Dashboards with Screen Intelligence'] }: AppShellProps) {
+export function AppShell({ children, title = 'Dashboard', breadcrumb = ['Dashboards with Feedback Intelligence'] }: AppShellProps) {
   const [aiPanelOpen, setAiPanelOpen] = useState(false)
   const [panelOpen, setPanelOpen] = useState(false)
 

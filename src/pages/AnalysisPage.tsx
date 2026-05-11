@@ -106,7 +106,7 @@ export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onO
   }
 
   return (
-    <AppShell title="Analysis" breadcrumb={['Screen Intelligence', 'Dashboard']}>
+    <AppShell title="Analysis" breadcrumb={['Feedback Intelligence', 'Dashboard']}>
       <div className="p-5 bg-[#F8FAFC] space-y-4">
         {/* Back link */}
         <button onClick={onBack} className="text-sm font-medium text-[#378ADD] hover:underline">

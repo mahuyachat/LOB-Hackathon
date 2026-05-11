@@ -27,7 +27,7 @@ function matchColor(pct: number): string {
 
 export function CohortPage({ onBack, onOpenInteraction }: { onBack: () => void; onOpenInteraction?: () => void }) {
   return (
-    <AppShell title="Cohort" breadcrumb={['Screen Intelligence', 'Dashboard', 'Analysis']}>
+    <AppShell title="Cohort" breadcrumb={['Feedback Intelligence', 'Dashboard', 'Analysis']}>
       <div className="p-5 bg-[#F8FAFC] space-y-5">
         {/* Back link */}
         <button onClick={onBack} className="text-sm font-medium text-[#2563EB] hover:underline">

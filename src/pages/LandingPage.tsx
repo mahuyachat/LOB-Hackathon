@@ -3,12 +3,12 @@ import { ArrowRight, Sparkles, Users } from 'lucide-react'
 
 export function LandingPage({ onSelectFlow }: { onSelectFlow: (flow: 'feedback' | 'agent') => void }) {
   return (
-    <AppShell title="Screen Intelligence" breadcrumb={[]}>
+    <AppShell title="Feedback Intelligence" breadcrumb={[]}>
       <div className="p-8 bg-[#F8FAFC] flex-1 flex items-center justify-center">
         <div className="max-w-5xl w-full">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-3xl font-bold text-[#0F172A]">Screen Intelligence</h1>
+            <h1 className="text-3xl font-bold text-[#0F172A]">Feedback Intelligence</h1>
             <p className="text-base text-[#64748B] mt-2">Choose your intelligence flow</p>
           </div>
 

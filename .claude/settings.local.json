@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx figma *)",
+      "mcp__058e3aa0-1e03-491f-8eec-f1225ba74d13__get_design_context",
+      "mcp__058e3aa0-1e03-491f-8eec-f1225ba74d13__get_screenshot",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "Bash(mkdir -p \"/Users/shaydiner/Library/CloudStorage/OneDrive-NICELtd/Archive/Documents/fm-lyra/.claude\")",
+      "mcp__Claude_Preview__preview_start",
+      "mcp__058e3aa0-1e03-491f-8eec-f1225ba74d13__get_variable_defs",
+      "Bash(gh auth *)",
+      "Bash(git init *)",
+      "Bash(git checkout *)",
+      "Bash(sudo npm install -g vercel)",
+      "Bash(npx vercel *)",
+      "Bash(~/.npm-global/bin/vercel login *)"
+    ]
+  }
+}
