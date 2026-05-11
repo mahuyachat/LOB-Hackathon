@@ -406,6 +406,10 @@ export default function App() {
         <PatternAlertBar onNavigate={() => setPage('analysis')} />
         <IntentTrendingTable />
 
+        {/* Health heatmap + recommendations */}
+        <HealthHeatmapCard />
+        <RecommendationsSection />
+
       </div>
     </AppShell>
   )
