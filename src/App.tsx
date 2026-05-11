@@ -1,9 +1,11 @@
 import { Fragment, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
 import { TrendingUp, Minus, ChevronRight, Sparkles, AlertTriangle } from 'lucide-react'
+import { LandingPage } from './pages/LandingPage'
 import { AnalysisPage } from './pages/AnalysisPage'
 import { CohortPage } from './pages/CohortPage'
 import { InteractionPage } from './pages/InteractionPage'
+import { SurveyFlowPage } from './pages/SurveyFlowPage'
 
 /* -------------------- Stat card -------------------- */
 function StatCard({ title, value, subtitle, borderColor = '#208337', alert }: {
@@ -364,8 +366,20 @@ function RecommendationsSection() {
 
 /* -------------------- App -------------------- */
 export default function App() {
+  const [flow, setFlow] = useState<'landing' | 'feedback' | 'agent'>('landing')
   const [page, setPage] = useState<'dashboard' | 'analysis' | 'cohort' | 'interaction'>('dashboard')
 
+  // Landing page
+  if (flow === 'landing') {
+    return <LandingPage onSelectFlow={(selectedFlow) => setFlow(selectedFlow)} />
+  }
+
+  // Agent flow - Survey Flow
+  if (flow === 'agent') {
+    return <SurveyFlowPage onBackToLanding={() => setFlow('landing')} />
+  }
+
+  // Feedback Intelligence flow
   if (page === 'interaction') {
     return <InteractionPage onBack={() => setPage('cohort')} onBackToAnalysis={() => setPage('analysis')} />
   }
@@ -381,6 +395,11 @@ export default function App() {
   return (
     <AppShell title="Dashboard" breadcrumb={['Screen Intelligence']}>
       <div className="p-6 bg-[#F8FAFC] flex-1 space-y-4">
+        {/* Back to landing link */}
+        <button onClick={() => setFlow('landing')} className="text-sm font-medium text-[#2563EB] hover:underline">
+          ← Back to landing
+        </button>
+
         {/* Top stats */}
         <div className="grid grid-cols-4 gap-4">
           <StatCard

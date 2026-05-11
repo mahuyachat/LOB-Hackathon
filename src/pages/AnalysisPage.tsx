@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import { AlertTriangle, Sparkles, ChevronRight, Shield, Check } from 'lucide-react'
 import { AppShell } from '../components/layout/AppShell'
 import './AnalysisPage.css'
@@ -35,20 +35,6 @@ function cellFg(cell: { value: string; pct?: number }): string {
   return '#1E293B'
 }
 
-/* Flow data */
-const STEPS = [
-  { label: 'Extracted', value: '3,520', percent: '100%' },
-  { label: 'Question', value: '2,534', percent: '72%' },
-  { label: 'Responded', value: '1,191', percent: '34%' },
-  { label: 'Confirmed', value: '1,060', percent: '30%' },
-]
-
-const ARROWS = [
-  { drop: '-28%', steepest: false },
-  { drop: '-53%', steepest: true },
-  { drop: '-11%', steepest: false },
-]
-
 /* Insights data with role labels */
 const INSIGHTS = [
   {
@@ -83,11 +69,9 @@ const INSIGHTS = [
 
 export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onOpenCohort?: () => void }) {
   const [accordion1Open, setAccordion1Open] = useState(false)
-  const [accordion2Open, setAccordion2Open] = useState(false)
   const [accordion3Open, setAccordion3Open] = useState(false)
   const [accordion4Open, setAccordion4Open] = useState(false)
   const [animateAccordion1, setAnimateAccordion1] = useState(false)
-  const [animateAccordion2, setAnimateAccordion2] = useState(false)
   const [animateAccordion3, setAnimateAccordion3] = useState(false)
   const [animateAccordion4, setAnimateAccordion4] = useState(false)
 
@@ -98,16 +82,6 @@ export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onO
     } else {
       setAccordion1Open(false)
       setAnimateAccordion1(false)
-    }
-  }
-
-  const handleAccordion2Toggle = () => {
-    if (!accordion2Open) {
-      setAccordion2Open(true)
-      setAnimateAccordion2(true)
-    } else {
-      setAccordion2Open(false)
-      setAnimateAccordion2(false)
     }
   }
 
@@ -471,8 +445,10 @@ export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onO
           </div>
         </div>
 
-        {/* Accordion 1 — Campaign Concentration */}
-        <div className="rounded-lg border border-[#E5E7EB] bg-white overflow-hidden">
+        {/* Three accordions side-by-side */}
+        <div className="flex gap-4">
+          {/* Accordion 1 — Campaign Concentration */}
+        <div className="flex-1 rounded-lg border border-[#E5E7EB] bg-white overflow-hidden">
           <button
             onClick={handleAccordion1Toggle}
             className="w-full px-5 py-5 flex items-center justify-between cursor-pointer hover:bg-[#FAFAFA] transition-colors group"
@@ -572,73 +548,15 @@ export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onO
           </div>
         </div>
 
-        {/* Accordion 2 — Conversion Flow */}
-        <div className="rounded-lg border border-[#E5E7EB] bg-white overflow-hidden" style={{ marginTop: '16px' }}>
-          <button
-            onClick={handleAccordion2Toggle}
-            className="w-full px-5 py-5 flex items-center justify-between cursor-pointer hover:bg-[#FAFAFA] transition-colors group"
-          >
-            <div>
-              <div className="text-[15px] font-semibold text-[#0F172A] text-left">How do interactions flow through Feedback Intelligence?</div>
-              <div className="text-xs text-[#64748B] mt-1 text-left">The stages an interaction moves through, from initial extraction to confirmed signal</div>
-              <div className="mt-1.5 flex justify-start">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FEE2E2] px-2.5 py-1 text-[11px] font-semibold text-[#991B1B]">
-                  <AlertTriangle className="h-3 w-3" />
-                  <span className="text-[10px] uppercase tracking-[0.05em]">PROBLEM</span>
-                  <span>·</span>
-                  <span>Steepest drop: Question → Responded (-53%)</span>
-                </span>
-              </div>
-            </div>
-            <ChevronRight
-              className={`h-5 w-5 text-[#475569] group-hover:text-[#0F172A] transition-all duration-200 flex-shrink-0 ml-4 ${accordion2Open ? 'rotate-90' : ''}`}
-            />
-          </button>
-          <div
-            className="overflow-hidden transition-all duration-200"
-            style={{ maxHeight: accordion2Open ? '1000px' : '0' }}
-          >
-            <div className={`px-5 pb-5 ${animateAccordion2 ? 'animate-accordion-2' : ''}`}>
-              {/* Flow boxes */}
-              <div className="flex items-center mt-5">
-            {STEPS.map((step, i) => (
-              <Fragment key={i}>
-                <div className={`flow-box-${i} w-[110px] h-[85px] flex flex-col items-center justify-center rounded-lg border border-[#E5E7EB] bg-white flex-shrink-0`}>
-                  <div className="text-xl font-bold text-[#0F172A] leading-none">{step.value}</div>
-                  <div className="text-xs text-[#64748B] mt-1">{step.percent}</div>
-                  <div className="text-[11px] font-medium text-[#475569] mt-0.5">{step.label}</div>
-                </div>
-                {i < ARROWS.length && (
-                  <div className={`flow-arrow-${i} flex flex-col items-center justify-center flex-1 min-w-[50px] px-1`}>
-                    <span className={ARROWS[i].steepest ? 'text-xs font-semibold text-[#DC2626]' : 'text-xs text-[#64748B]'}>
-                      {ARROWS[i].steepest && '⚠ '}{ARROWS[i].drop}
-                    </span>
-                    <div className="w-full flex items-center my-1">
-                      <div className="flex-1" style={{ height: ARROWS[i].steepest ? '4px' : '2px', backgroundColor: ARROWS[i].steepest ? '#DC2626' : '#94A3B8' }} />
-                      <div className="w-0 h-0 border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent border-l-[6px] flex-shrink-0" style={{ borderLeftColor: ARROWS[i].steepest ? '#DC2626' : '#94A3B8' }} />
-                    </div>
-                  </div>
-                )}
-              </Fragment>
-            ))}
-              </div>
-
-              <div className="flow-footer mt-2 text-xs text-[#64748B]">
-                Steepest drop at <span className="font-bold text-[#DC2626]">Question → Responded</span> — 1,343 customers received the survey but didn't engage.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Accordion 3 — Where the 1,343 dropped */}
-        <div className="rounded-lg border border-[#E5E7EB] bg-white overflow-hidden" style={{ marginTop: '16px' }}>
+        {/* Accordion 2 — Where the 1,343 dropped */}
+        <div className="flex-1 rounded-lg border border-[#E5E7EB] bg-white overflow-hidden">
           <button
             onClick={handleAccordion3Toggle}
             className="w-full px-5 py-5 flex items-center justify-between cursor-pointer hover:bg-[#FAFAFA] transition-colors group"
           >
             <div>
               <div className="text-[15px] font-semibold text-[#0F172A] text-left">Which intent is driving the drop?</div>
-              <div className="text-xs text-[#64748B] mt-1 text-left">The 53% drop at Question → Responded, broken down by intent</div>
+              <div className="text-xs text-[#64748B] mt-1 text-left">Where the 1,343 affected customers are concentrated, broken down by intent</div>
               <div className="mt-1.5 flex justify-start">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FEE2E2] px-2.5 py-1 text-[11px] font-semibold text-[#991B1B]">
                   <AlertTriangle className="h-3 w-3" />
@@ -697,8 +615,8 @@ export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onO
           </div>
         </div>
 
-        {/* Accordion 4 — Why we trust this read */}
-        <div className="rounded-lg border border-[#E5E7EB] bg-white overflow-hidden" style={{ marginTop: '16px' }}>
+        {/* Accordion 3 — Why we trust this read */}
+        <div className="flex-1 rounded-lg border border-[#E5E7EB] bg-white overflow-hidden">
           <button
             onClick={handleAccordion4Toggle}
             className="w-full px-5 py-5 flex items-center justify-between cursor-pointer hover:bg-[#FAFAFA] transition-colors group"
@@ -784,6 +702,7 @@ export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onO
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </AppShell>

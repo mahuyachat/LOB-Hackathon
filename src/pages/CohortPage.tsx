@@ -4,7 +4,6 @@ import { Star, Search } from 'lucide-react'
 const SUMMARY_TILES = [
   { value: '890', value2: '457', label: 'total customers', label2: 'responding to survey', green: false },
   { value: '87%', label: 'had bot-to-human handoff', green: false },
-  { value: '+60', label: 'avg agent FI signal (positive)', green: true },
 ]
 
 const TABLE_ROWS = [
@@ -43,7 +42,7 @@ export function CohortPage({ onBack, onOpenInteraction }: { onBack: () => void; 
         </div>
 
         {/* Section 1 — Summary Strip */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {SUMMARY_TILES.map((tile, i) => (
             <div key={i} className="rounded-lg border border-[#E5E7EB] bg-white p-4">
               {i === 0 ? (
