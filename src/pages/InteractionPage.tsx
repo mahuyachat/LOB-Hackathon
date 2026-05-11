@@ -3,7 +3,7 @@ import { AppShell } from '../components/layout/AppShell'
 
 const VU_SCORES = [
   { intent: 'Agent Resolution', score: '+68', color: '#16A34A', description: 'Rachel resolved the issue cleanly — refund processed, bundle removed, account protected.' },
-  { intent: 'Bot Transfer Impact', score: '-52', color: '#DC2626', description: 'The bot-to-human handoff created friction. CRM routing failure triggered the transfer.' },
+  { intent: 'Bot Transfer Impact', score: '-52', color: '#DC2626', description: 'The bot-to-human handoff created friction. Billing policy changes impacted the routing, triggering the transfer.' },
   { intent: 'System Listening', score: '-38', color: '#DC2626', description: 'Customer felt unheard during the bot phase — repeated the issue twice before transfer.' },
   { intent: 'Issue Clarity', score: '-34', color: '#DC2626', description: 'The unauthorized charge wasn\'t immediately surfaced by the system — customer had to explain.' },
 ]
@@ -131,7 +131,7 @@ export function InteractionPage({ onBack, onBackToAnalysis }: { onBack: () => vo
                   <span className="text-sm font-semibold text-[#DC2626]">The Friction Point</span>
                   <AlertTriangle className="h-3.5 w-3.5 text-[#DC2626]" />
                 </div>
-                <div className="mt-1 text-[13px] text-[#475569] leading-relaxed">AI billing routing failed (a CRM update on May 1 broke this routing). Andrew transferred the call to a human agent. <span className="font-bold text-[#0F172A]">Sentiment shifted: Positive → Neutral.</span></div>
+                <div className="mt-1 text-[13px] text-[#475569] leading-relaxed">AI billing routing didn't apply (recent billing policy changes impacted the routing). Andrew transferred the call to a human agent — and James had to re-explain the entire $87 charge dispute from scratch. <span className="font-bold text-[#0F172A]">Sentiment shifted: Positive → Neutral.</span></div>
               </div>
             </div>
             {/* Stage 3 */}

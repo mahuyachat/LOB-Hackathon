@@ -6,7 +6,7 @@ import { CohortPage } from './pages/CohortPage'
 import { InteractionPage } from './pages/InteractionPage'
 
 /* -------------------- Stat card -------------------- */
-function StatCard({ title, value, subtitle, borderColor = '#22C55E', alert }: {
+function StatCard({ title, value, subtitle, borderColor = '#208337', alert }: {
   title: string
   value: string
   subtitle: string
@@ -14,20 +14,26 @@ function StatCard({ title, value, subtitle, borderColor = '#22C55E', alert }: {
   alert?: { delta: string }
 }) {
   const isAlert = !!alert
+  const alertColor = '#e32926'
+  const alertBg = '#fdeaea'
+
   return (
     <div
-      className="rounded-lg border border-[#E5E7EB] p-6 overflow-hidden relative flex flex-col min-h-[160px] justify-center"
-      style={{ backgroundColor: isAlert ? '#FEF2F2' : '#FFFFFF' }}
+      className="rounded-lg p-6 overflow-hidden relative flex flex-col min-h-[160px] justify-center"
+      style={{
+        backgroundColor: '#FFFFFF',
+        border: isAlert ? `1px solid ${borderColor}` : '1px solid #e5e7eb'
+      }}
     >
       <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ backgroundColor: borderColor }} />
       <div className="text-sm font-medium text-[#475569]">{title}</div>
       <div className="mt-2 flex items-baseline gap-3">
-        <span className="text-5xl font-bold tracking-tight" style={{ color: isAlert ? '#DC2626' : '#0F172A' }}>{value}</span>
+        <span className="text-5xl tracking-tight" style={{ color: isAlert ? alertColor : '#0F172A', fontWeight: isAlert ? '400' : '700' }}>{value}</span>
         {isAlert && (
-          <span className="text-[13px] font-medium text-[#DC2626]">{alert.delta}</span>
+          <span className="text-[13px] font-medium" style={{ color: alertColor }}>{alert.delta}</span>
         )}
       </div>
-      <div className="mt-2 text-[13px] text-[#64748B]">{subtitle}</div>
+      <div className="mt-2 text-[13px] italic text-[#64748B]">{subtitle}</div>
     </div>
   )
 }
@@ -35,17 +41,18 @@ function StatCard({ title, value, subtitle, borderColor = '#22C55E', alert }: {
 /* -------------------- Component 1: Pattern Alert Bar -------------------- */
 function PatternAlertBar({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <div className="rounded-lg bg-[#FEF3C7] border-l-4 border-l-[#F59E0B] px-5 py-4 flex items-center">
+    <div className="rounded-lg bg-white border border-[#e53935] px-5 py-4 flex items-center">
       <div className="flex items-start gap-2.5 flex-1">
-        <Sparkles className="h-[18px] w-[18px] text-[#D97706] flex-shrink-0 mt-0.5" />
+        <Sparkles className="h-[18px] w-[18px] text-[#e32926] flex-shrink-0 mt-0.5" />
         <div>
-          <div className="text-sm font-semibold text-[#92400E]">Pattern detected · 3 billing-flow intents trending together</div>
-          <div className="text-xs text-[#B45309] mt-0.5">1,343 customers affected by handoff repetition · ↑15% week-over-week</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#e32926]">CROSS-INTENT FRICTION DETECTED</div>
+          <div className="text-sm font-semibold text-[#1f2937] mt-1">Customers are rating agents low for friction the agents didn't cause.</div>
+          <div className="text-xs text-[#4b5563] mt-1">3 billing-flow intents · 1,343 customers affected by handoff repetition · ↑15% week-over-week</div>
         </div>
       </div>
       <button
         onClick={onNavigate}
-        className="inline-flex items-center rounded-lg border border-[#F59E0B] bg-white px-3.5 py-1.5 text-xs font-medium text-[#92400E] hover:bg-[#FEF3C7] transition-colors flex-shrink-0 cursor-pointer"
+        className="inline-flex items-center rounded-lg border border-[#e53935] bg-white px-3.5 py-1.5 text-xs font-medium text-[#1f2937] hover:bg-[#fdeaea] transition-colors flex-shrink-0 cursor-pointer"
       >
         see analysis →
       </button>
@@ -66,16 +73,17 @@ type TrendRow = {
 }
 
 const INTENT_ROWS: TrendRow[] = [
-  { intent: 'Refund Processing', category: 'Billing', volume: '1,420', avgVU: '34', trend: { type: 'up', value: '18%' }, linked: true },
-  { intent: 'Billing Dispute', category: 'Billing', volume: '1,210', avgVU: '32', trend: { type: 'up', value: '12%' }, linked: true },
+  { intent: 'Refund Processing', category: 'Billing', volume: '1,420', avgVU: '34', trend: { type: 'up', value: '+18%' }, linked: true },
+  { intent: 'Billing Dispute', category: 'Billing', volume: '1,210', avgVU: '32', trend: { type: 'up', value: '+12%' }, linked: true },
   { intent: 'Call Transfer Impact', category: 'Tech Support', volume: '890', volumeNote: '(flat)', avgVU: '29', trend: { type: 'sentiment', value: '-29%' }, linked: true, friction: true },
   { intent: 'Payment Gateway Timeout', category: 'Other', volume: '210', avgVU: '35', trend: { type: 'flat' } },
 ]
 
-function TrendCell({ trend }: { trend: TrendRow['trend'] }) {
+function TrendCell({ trend, linked }: { trend: TrendRow['trend']; linked?: boolean }) {
   if (trend.type === 'up') {
+    const color = linked ? '#e32926' : '#208337'
     return (
-      <span className="inline-flex items-center gap-1 text-[#16A34A]">
+      <span className="inline-flex items-center gap-1" style={{ color }}>
         <TrendingUp className="h-3.5 w-3.5" />
         <span className="text-sm">{trend.value}</span>
       </span>
@@ -83,9 +91,9 @@ function TrendCell({ trend }: { trend: TrendRow['trend'] }) {
   }
   if (trend.type === 'sentiment') {
     return (
-      <span className="inline-flex items-center gap-1 text-[#DC2626]">
-        <AlertTriangle className="h-3.5 w-3.5" />
-        <span className="text-[13px]">Feedback Intelligence Signal {trend.value}</span>
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#fdeaea] px-2.5 py-1 text-[11px] font-semibold text-[#e32926]">
+        <AlertTriangle className="h-3 w-3" />
+        <span>FI signal {trend.value}</span>
       </span>
     )
   }
@@ -136,7 +144,7 @@ function IntentTrendingTable() {
                 {row.volumeNote && <div className="text-[11px] text-[#94A3B8]">{row.volumeNote}</div>}
               </td>
               <td className="px-5 py-4 text-sm text-[#334155]">{row.avgVU}</td>
-              <td className="px-5 py-4"><TrendCell trend={row.trend} /></td>
+              <td className="px-5 py-4"><TrendCell trend={row.trend} linked={row.linked} /></td>
             </tr>
           ))}
         </tbody>
@@ -379,25 +387,25 @@ export default function App() {
             title="Response Rate"
             value="67%"
             subtitle="Are surveys reaching customers?"
-            borderColor="#22C55E"
+            borderColor="#208337"
           />
           <StatCard
             title="Validation Rate"
             value="89%"
             subtitle="Did the AI's read match what customers said?"
-            borderColor="#22C55E"
+            borderColor="#208337"
           />
           <StatCard
             title="Validation Confidence"
             value="87%"
             subtitle="How confident are we in those reads?"
-            borderColor="#22C55E"
+            borderColor="#208337"
           />
           <StatCard
             title="Hidden Friction Rate"
             value="14%"
             subtitle="Low ratings the agent didn't earn"
-            borderColor="#DC2626"
+            borderColor="#e53935"
             alert={{ delta: '↑ +10pts vs prior 7 days' }}
           />
         </div>

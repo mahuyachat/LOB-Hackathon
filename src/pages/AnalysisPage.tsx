@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import { AlertTriangle, Sparkles, ChevronRight } from 'lucide-react'
+import { AlertTriangle, Sparkles, ChevronRight, Shield, Check } from 'lucide-react'
 import { AppShell } from '../components/layout/AppShell'
 import './AnalysisPage.css'
 
@@ -49,12 +49,36 @@ const ARROWS = [
   { drop: '-11%', steepest: false },
 ]
 
-/* Insights data */
+/* Insights data with role labels */
 const INSIGHTS = [
-  { title: 'The friction is not the agent.', fact: 'Agent FI signal averages +60 across the 1,060 confirmed responses. Agents are resolving cleanly.' },
-  { title: 'FI\'s contextual questions caught the friction in the customer\'s own words.', fact: 'The questions targeted the handoff and re-explanation experience. Customer answers matched the prediction — the friction was the context loss at transfer, validated directly by the people who lived through it.' },
-  { title: 'The CRM update on May 1 broke AI billing routing.', fact: 'Call Transfer Impact is the resulting friction signal — concentrated in this cluster, not random.' },
-  { title: 'FI\'s read is reliable.', fact: 'Validation accuracy on Transfer interactions in this cluster is 73-75% — the highest band in the Intent × Action matrix.' },
+  {
+    roleLabel: 'FINDING',
+    title: 'The friction is not the agent.',
+    fact: 'Agent FI signal averages +60 across the 1,060 confirmed responses. Agents are resolving cleanly.',
+    stripeColor: '#16A34A',
+    icon: 'shield'
+  },
+  {
+    roleLabel: 'METHOD',
+    title: 'FI\'s contextual questions caught the friction in the customer\'s own words.',
+    fact: 'The questions targeted the handoff and re-explanation experience. Customer answers matched the prediction — the friction was the context loss at transfer, validated directly by the people who lived through it.',
+    stripeColor: '#D97706',
+    icon: 'sparkles'
+  },
+  {
+    roleLabel: 'ROOT CAUSE',
+    title: 'Billing policies changed, impacting the AI routing.',
+    fact: 'Call Transfer Impact is the resulting friction signal — concentrated in this cluster, not random.',
+    stripeColor: '#DC2626',
+    icon: 'warning'
+  },
+  {
+    roleLabel: 'TRUST',
+    title: 'FI\'s read is reliable.',
+    fact: 'Validation accuracy on Transfer interactions in this cluster is 73-75% — the highest band in the Intent × Action matrix.',
+    stripeColor: '#16A34A',
+    icon: 'check'
+  },
 ]
 
 export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onOpenCohort?: () => void }) {
@@ -121,115 +145,210 @@ export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onO
           <p className="text-[13px] text-[#64748B] mt-1">Tracking 3,520 interactions across 3 linked intents · Last 7 days</p>
         </div>
 
-        {/* Act 1 — The Inversion (single horizontal strip) */}
-        <div className="rounded-lg border-2 border-[#DC2626] bg-white px-5 py-3 flex items-center gap-6">
-          <div className="flex-shrink-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#991B1B]">THE INVERSION</div>
-            <div className="mt-0.5 text-sm font-semibold text-[#0F172A]">Customers downrate even when the agent did well</div>
-            <div className="mt-0.5 text-xs text-[#475569]">Of the 1,060 confirmed responses in this cluster</div>
-          </div>
-          <div className="h-10 w-px bg-[#E5E7EB] flex-shrink-0" />
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <span className="text-[28px] font-bold text-[#DC2626] leading-none">84%</span>
-            <span className="text-xs text-[#0F172A]">rated ≤3★</span>
-          </div>
-          <div className="h-10 w-px bg-[#E5E7EB] flex-shrink-0" />
-          <div className="flex flex-col gap-1 flex-shrink-0">
-            <div className="text-xs text-[#0F172A]">agent FI signal</div>
-            <div className="text-[11px] text-[#475569]">(positive — agent did well)</div>
+        {/* Top row: Inversion (left 50%) + Insights (right 50%) */}
+        <div className="flex gap-4 items-stretch">
+          {/* Left — The Inversion banner */}
+          <div className="flex-1 rounded-lg border-2 border-[#DC2626] bg-white p-6">
+            {/* Section 1: Title block with Stardust icon */}
+            <div>
+              <div className="flex items-center gap-1.5">
+                <Sparkles className="h-3 w-3 text-[#991B1B]" />
+                <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#991B1B]">THE INVERSION</div>
+              </div>
+              <div className="mt-1 text-base font-semibold text-[#0F172A]">Customers downrate even when the agent did well</div>
+              <div className="mt-1.5 text-xs text-[#475569]">Of the 1,060 confirmed responses in this cluster</div>
+            </div>
 
-            {/* Sentiment trajectory gradient bar */}
-            <div className="mt-2">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.05em] text-[#475569]">SENTIMENT TRAJECTORY</div>
-              <div className="mt-2 relative" style={{ width: '200px' }}>
-                {/* Gradient bar */}
-                <div
-                  className="h-[10px] rounded-full"
-                  style={{
-                    background: 'linear-gradient(to right, #16A34A 0%, #16A34A 40%, #D97706 60%, #D97706 100%)'
-                  }}
-                />
-                {/* Handoff marker */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[2px] h-[18px] bg-[#DC2626]" />
-                {/* Warning icon above marker */}
-                <div className="absolute left-1/2 -translate-x-1/2 -top-[16px] text-[#DC2626] text-xs">⚠</div>
+            {/* Section 2: Divider */}
+            <div className="my-4 border-t border-[#E5E7EB]" />
 
-                {/* Labels */}
-                <div className="mt-2 flex justify-between items-center text-[11px]">
-                  <span className="text-[#16A34A]">Positive</span>
-                  <span className="text-[#DC2626] text-[10px]">handoff</span>
-                  <span className="text-[#D97706]">Neutral</span>
+            {/* Section 3: 84% rating evidence */}
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-4xl font-bold text-[#DC2626] leading-none">84%</span>
+                <span className="text-[13px] font-medium text-[#0F172A]">rated ≤3★</span>
+              </div>
+              <div className="mt-1 text-xs text-[#64748B]">(892 customers)</div>
+            </div>
+
+            {/* Section 4: Sparkline chart */}
+            <div className="mt-4">
+              <div className="flex flex-col items-center">
+                <svg width="360" height="120" viewBox="0 0 360 120" className="overflow-visible">
+                  <defs>
+                    {/* Gradient for area fill */}
+                    <linearGradient id="sentimentFill" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#16A34A" stopOpacity="0.18" />
+                      <stop offset="50%" stopColor="#94A3B8" stopOpacity="0.10" />
+                      <stop offset="100%" stopColor="#D97706" stopOpacity="0.18" />
+                    </linearGradient>
+                    {/* Gradient for line stroke */}
+                    <linearGradient id="sentimentLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#16A34A" />
+                      <stop offset="50%" stopColor="#64748B" />
+                      <stop offset="100%" stopColor="#D97706" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Layer 1: Baseline grid lines */}
+                  <line x1="30" y1="22" x2="330" y2="22" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="4 4" />
+                  <line x1="30" y1="82" x2="330" y2="82" stroke="#E5E7EB" strokeWidth="1.5" strokeDasharray="4 4" />
+
+                  {/* Layer 2: Area fill below the curve */}
+                  <path
+                    d="M 30 22 C 120 22, 165 22, 180 52 S 270 82, 330 82 L 330 112 L 30 112 Z"
+                    fill="url(#sentimentFill)"
+                  />
+
+                  {/* Layer 3: The line/curve with gradient stroke */}
+                  <path
+                    d="M 30 22 C 120 22, 165 22, 180 52 S 270 82, 330 82"
+                    stroke="url(#sentimentLine)"
+                    strokeWidth="3.5"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+
+                  {/* Layer 4: Handoff vertical marker */}
+                  <line x1="180" y1="15" x2="180" y2="90" stroke="#D97706" strokeWidth="2" strokeDasharray="6 4" strokeOpacity="0.6" />
+
+                  {/* Layer 5: Dots with halos */}
+                  {/* Starting dot halo */}
+                  <circle cx="30" cy="22" r="14" fill="#16A34A" opacity="0.2" />
+                  {/* Starting dot */}
+                  <circle cx="30" cy="22" r="8" fill="#16A34A" stroke="#FFFFFF" strokeWidth="3" />
+
+                  {/* Handoff dot (no halo) */}
+                  <circle cx="180" cy="52" r="7" fill="#475569" stroke="#FFFFFF" strokeWidth="3" />
+
+                  {/* Ending dot halo */}
+                  <circle cx="330" cy="82" r="14" fill="#D97706" opacity="0.2" />
+                  {/* Ending dot */}
+                  <circle cx="330" cy="82" r="8" fill="#D97706" stroke="#FFFFFF" strokeWidth="3" />
+
+                  {/* Layer 6: Handoff pin (floating tag at top) */}
+                  <g>
+                    {/* Pin background rect */}
+                    <rect x="147" y="0" width="66" height="22" rx="4" fill="#D97706" />
+                    {/* Pin pointer triangle */}
+                    <polygon points="177,22 183,22 180,28" fill="#D97706" />
+                    {/* Pin text */}
+                    <text x="180" y="15" textAnchor="middle" fontSize="13" fontWeight="600" fill="#FFFFFF" fontFamily="system-ui, -apple-system, sans-serif">handoff</text>
+                  </g>
+                </svg>
+
+                {/* Labels below chart */}
+                <div className="mt-4 flex justify-between items-center" style={{ width: '360px' }}>
+                  <span className="text-[13px] font-semibold text-[#16A34A]">Positive</span>
+                  <span className="text-[13px] font-semibold text-[#D97706]">Neutral</span>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="h-10 w-px bg-[#E5E7EB] flex-shrink-0" />
-          <div className="text-xs italic text-[#475569]">Friction sits upstream — not the agent.</div>
-        </div>
 
-        {/* Two-column row: Insights (left 50%) + Recommended actions (right 50%) */}
-        <div className="flex gap-4 items-stretch">
-          {/* Left column — What Feedback Intelligence is telling us */}
+            {/* Section 5: Bottom takeaway */}
+            <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
+              <div className="text-[13px] italic text-[#475569] text-center">Friction sits upstream — not the agent.</div>
+            </div>
+          </div>
+
+          {/* Right — What Feedback Intelligence is telling us */}
           <div className="flex-1 rounded-lg border border-[#E5E7EB] bg-white p-5">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-[#378ADD]" />
+              <Sparkles className="h-4 w-4 text-[#D97706]" />
               <span className="text-[15px] font-semibold text-[#0F172A]">What Feedback Intelligence is telling us</span>
             </div>
             <div className="text-xs text-[#64748B] mt-1">Four observations from the cluster's signal pile</div>
 
             <div className="mt-4 space-y-4">
               {INSIGHTS.map((insight, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#F1F5F9] text-xs font-semibold text-[#0F172A]">
-                    {i + 1}
+                <div
+                  key={i}
+                  className="pl-3"
+                  style={{ borderLeft: `3px solid ${insight.stripeColor}` }}
+                >
+                  {/* Role label (eyebrow) */}
+                  <div
+                    className="text-[10px] font-semibold uppercase tracking-[0.05em] mb-1"
+                    style={{ color: insight.stripeColor }}
+                  >
+                    {insight.roleLabel}
                   </div>
-                  <div>
-                    <div className="text-[13px] font-semibold text-[#0F172A]">{insight.title}</div>
-                    <div className="mt-0.5 text-xs text-[#475569] leading-[1.4]">{insight.fact}</div>
+
+                  {/* Title row with role icon */}
+                  <div className="flex items-start gap-1.5">
+                    {/* Role icon */}
+                    <div className="flex-shrink-0 mt-0.5">
+                      {insight.icon === 'shield' && <Shield className="h-3 w-3" style={{ color: insight.stripeColor }} />}
+                      {insight.icon === 'sparkles' && <Sparkles className="h-3 w-3" style={{ color: insight.stripeColor }} />}
+                      {insight.icon === 'warning' && <AlertTriangle className="h-3 w-3" style={{ color: insight.stripeColor }} />}
+                      {insight.icon === 'check' && <Check className="h-3 w-3" style={{ color: insight.stripeColor }} />}
+                    </div>
+
+                    {/* Title */}
+                    <div className="flex-1">
+                      <div className="text-[14px] font-semibold text-[#0F172A] leading-tight">{insight.title}</div>
+                    </div>
+                  </div>
+
+                  {/* Supporting fact */}
+                  <div className="mt-1 text-xs text-[#475569] leading-[1.5] pl-[18px]">
+                    {insight.fact}
                   </div>
                 </div>
               ))}
             </div>
           </div>
+        </div>
 
-          {/* Right column — Recommended actions */}
-          <div className="flex-1 rounded-lg border border-[#E5E7EB] bg-white p-5">
-            <div className="text-[15px] font-semibold text-[#0F172A]">Recommended actions</div>
-            <div className="text-xs text-[#64748B] mt-1">Two actions to take based on the diagnosis above</div>
+        {/* Bottom row: Actions Taken (full width) */}
+        <div>
+          {/* Section header */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-[#D97706]" />
+              <span className="text-[15px] font-semibold text-[#0F172A]">Actions Taken</span>
+            </div>
+            <div className="text-xs text-[#64748B] mt-1">What FI has already done about this</div>
+          </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-4 items-stretch">
-              {/* Card 1 */}
-              <div className="rounded-lg border border-[#E5E7EB] bg-white p-[18px] flex flex-col">
+            {/* Cards container */}
+            <div className="flex gap-4">
+              {/* Card 1 — Alert has been sent to CX manager */}
+              <div className="flex-1 rounded-lg border border-[#E5E7EB] bg-white p-[18px] flex flex-col">
                 {/* Pill — Completed status */}
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#DCFCE7] px-2.5 py-1 text-[11px] font-semibold text-[#166534] self-start">
                   <span className="text-xs">✓</span>
                   Completed · sent today
                 </span>
 
-                {/* Title row with badge */}
-                <div className="flex items-start gap-2.5 mt-4">
-                  <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#FEF3C7] text-xs font-semibold text-[#92400E]">①</div>
+                {/* Title row with numbered badge and Stardust icon */}
+                <div className="flex items-start gap-2 mt-4" style={{ minHeight: '70px' }}>
+                  <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#FEF3C7] text-xs font-semibold text-[#92400E]">
+                    ①
+                  </div>
+                  <Sparkles className="h-4 w-4 text-[#D97706] flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="text-sm font-semibold text-[#0F172A]">Alert has been sent to CX manager</div>
-                    <div className="text-xs text-[#64748B] mt-0.5">Root cause: CRM routing failure</div>
+                    <div className="text-xs text-[#64748B] mt-0.5">Root cause: billing policy changes</div>
                   </div>
                 </div>
 
                 {/* Two-metric strip */}
-                <div className="grid grid-cols-2 gap-3 mt-4 min-h-[70px]">
-                  <div>
+                <div className="flex justify-around mt-4" style={{ minHeight: '60px' }}>
+                  <div className="text-center">
                     <div className="text-[22px] font-bold text-[#0F172A]">1,343</div>
                     <div className="text-[11px] text-[#64748B] mt-1">customers affected</div>
                   </div>
-                  <div>
+                  <div className="text-center">
                     <div className="text-[22px] font-bold text-[#0F172A]">1</div>
                     <div className="text-[11px] text-[#64748B] mt-1">CX manager notified</div>
                   </div>
                 </div>
 
                 {/* Description */}
-                <p className="mt-4 text-xs text-[#475569] leading-relaxed min-h-[100px]">
-                  The CRM update on May 1 is the root cause of the cluster's friction. FI has alerted the CX manager with the diagnosis so the routing fix can be assigned to the right team.
+                <p className="mt-4 text-xs text-[#475569] leading-relaxed" style={{ minHeight: '90px' }}>
+                  Billing policy changes are the root cause of the cluster's friction — they cascaded into the AI routing, generating handoffs that shouldn't have happened. FI has alerted the CX manager with the diagnosis so the routing can be aligned to the new policy.
                 </p>
 
                 {/* Action chip — right-aligned, footer */}
@@ -240,42 +359,45 @@ export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onO
                 </div>
               </div>
 
-              {/* Card 2 */}
-              <div className="rounded-lg border border-[#E5E7EB] bg-white p-[18px] flex flex-col">
+              {/* Card 2 — Campaign has been optimized */}
+              <div className="flex-1 rounded-lg border border-[#E5E7EB] bg-white p-[18px] flex flex-col">
                 {/* Pill — Auto-optimized status */}
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#DCFCE7] px-2.5 py-1 text-[11px] font-semibold text-[#166534] self-start">
                   <span className="text-xs">✓</span>
                   Auto-optimized · today
                 </span>
 
-                {/* Title row with badge */}
-                <div className="flex items-start gap-2.5 mt-4">
-                  <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#FEF3C7] text-xs font-semibold text-[#92400E]">②</div>
+                {/* Title row with numbered badge and Stardust icon */}
+                <div className="flex items-start gap-2 mt-4" style={{ minHeight: '70px' }}>
+                  <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#FEF3C7] text-xs font-semibold text-[#92400E]">
+                    ②
+                  </div>
+                  <Sparkles className="h-4 w-4 text-[#D97706] flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="text-sm font-semibold text-[#0F172A]">Campaign has been optimized</div>
-                    <div className="text-xs text-[#64748B] mt-0.5">Suppression rule updated · 1,343 ratings tagged</div>
+                    <div className="text-xs text-[#64748B] mt-0.5">Hold these ratings pending the routing alignment</div>
                   </div>
                 </div>
 
                 {/* Three-metric strip */}
-                <div className="grid grid-cols-3 gap-3 mt-4 min-h-[70px]">
-                  <div>
+                <div className="flex justify-around mt-4" style={{ minHeight: '60px' }}>
+                  <div className="text-center">
                     <div className="text-[22px] font-bold text-[#0F172A]">1,343</div>
                     <div className="text-[11px] text-[#64748B] mt-1">ratings tagged for review</div>
                   </div>
-                  <div>
+                  <div className="text-center">
                     <div className="text-[22px] font-bold text-[#16A34A]">+0.4★</div>
                     <div className="text-[11px] text-[#64748B] mt-1">expected agent score recovery</div>
                   </div>
-                  <div>
+                  <div className="text-center">
                     <div className="text-[22px] font-bold text-[#0F172A]">8</div>
                     <div className="text-[11px] text-[#64748B] mt-1">retention-unit agents protected</div>
                   </div>
                 </div>
 
                 {/* Description */}
-                <p className="mt-4 text-xs text-[#475569] leading-relaxed min-h-[100px]">
-                  FI has tightened the campaign's suppression rule to prevent further pollution from this pattern, and tagged the 1,343 affected ratings for QM review. Decide whether to permanently exclude or re-include them after the CRM fix lands.
+                <p className="mt-4 text-xs text-[#475569] leading-relaxed" style={{ minHeight: '90px' }}>
+                  FI has tightened the campaign's suppression rule to prevent further pollution from this pattern, and tagged the 1,343 affected ratings for QM review. Decide whether to permanently exclude or re-include them after the routing is aligned to the new policy.
                 </p>
 
                 {/* Action chip — right-aligned, footer */}
@@ -285,8 +407,56 @@ export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onO
                   </button>
                 </div>
               </div>
+
+              {/* Card 3 — Friction tracked weekly */}
+              <div className="flex-1 rounded-lg border border-[#E5E7EB] bg-white p-[18px] flex flex-col">
+                {/* Pill — Monitoring active status */}
+                <span className="inline-flex items-center gap-2 rounded-full bg-[#DCFCE7] px-2.5 py-1 text-[11px] font-semibold text-[#166534] self-start">
+                  <span className="text-xs">✓</span>
+                  Monitoring active · today
+                </span>
+
+                {/* Title row with numbered badge and Stardust icon */}
+                <div className="flex items-start gap-2 mt-4" style={{ minHeight: '70px' }}>
+                  <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#FEF3C7] text-xs font-semibold text-[#92400E]">
+                    ③
+                  </div>
+                  <Sparkles className="h-4 w-4 text-[#D97706] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <div className="text-sm font-semibold text-[#0F172A]">Friction tracked weekly</div>
+                    <div className="text-xs text-[#64748B] mt-0.5">Until routing alignment lands</div>
+                  </div>
+                </div>
+
+                {/* Three-metric strip */}
+                <div className="flex justify-around mt-4" style={{ minHeight: '60px' }}>
+                  <div className="text-center">
+                    <div className="text-[18px] font-bold text-[#0F172A]">7 days</div>
+                    <div className="text-[11px] text-[#64748B] mt-1">tracking cadence</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-[16px] font-semibold text-[#0F172A]">handoff</div>
+                    <div className="text-[11px] text-[#64748B] mt-1">signal monitored</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-[18px] font-bold text-[#16A34A]">↓</div>
+                    <div className="text-[11px] text-[#64748B] mt-1">expected decline</div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="mt-4 text-xs text-[#475569] leading-relaxed" style={{ minHeight: '90px' }}>
+                  FI will track the handoff repetition signal weekly. You'll get an alert if it persists or grows. Expected to decline as the routing aligns to the new policy.
+                </p>
+
+                {/* Action chip — right-aligned, footer */}
+                <div className="mt-auto pt-4 flex justify-end">
+                  <button className="inline-flex items-center rounded-lg border border-[#16A34A] bg-white px-3.5 py-2 text-[13px] text-[#166534] hover:bg-[#F0FDF4] transition-colors">
+                    Configure tracking →
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
         </div>
 
         {/* Section divider — Show diagnostic details */}
@@ -396,7 +566,7 @@ export function AnalysisPage({ onBack, onOpenCohort }: { onBack: () => void; onO
               </div>
 
               <div className="footer-text mt-4 text-xs italic text-[#475569] max-w-[700px]">
-                Most of the cohort lives in Retention Voice Q2 (voice channel). The bot-to-human handoff failure is concentrated where the CRM billing routing was triggered.
+                Most of the cohort lives in Retention Voice Q2 (voice channel). The bot-to-human handoff failure is concentrated where the AI billing routing was impacted by recent policy changes.
               </div>
             </div>
           </div>
