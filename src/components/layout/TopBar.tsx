@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
-import { HelpCircle, Bell, ChevronDown, LayoutGrid, MessageSquareText, Users, BarChart2, ClipboardCheck, Headphones } from 'lucide-react'
+import { HelpCircle, Bell, ChevronDown, MessageSquareText, Users, BarChart2, ClipboardCheck, Headphones } from 'lucide-react'
 
 const APPS = [
   { id: 'feedback', label: 'Feedback Intelligence', icon: MessageSquareText, current: true },
@@ -68,10 +68,6 @@ export function TopBar() {
       <div className="flex items-center gap-1">
         <button className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
           <HelpCircle className="h-[18px] w-[18px]" />
-        </button>
-
-        <button className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-          <LayoutGrid className="h-[18px] w-[18px]" />
         </button>
 
         <button className="relative flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
