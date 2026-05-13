@@ -23,7 +23,7 @@ export function SidebarPanel({ open }: SidebarPanelProps) {
     <div
       className={cn(
         'flex flex-col flex-shrink-0 bg-white overflow-hidden transition-all duration-200 ease-in-out border-r border-[#E2E8F0]',
-        open ? 'w-[210px]' : 'w-[52px]'
+        open ? 'w-[220px]' : 'w-[52px]'
       )}
     >
       {/* Spacer */}
@@ -54,7 +54,7 @@ export function SidebarPanel({ open }: SidebarPanelProps) {
                 <Icon className={cn('h-4 w-4 flex-shrink-0', isSelected ? 'text-[#126bce]' : 'text-[#64748B]')} />
                 {open && (
                   <>
-                    <span className="flex-1 text-left truncate">{item.label}</span>
+                    <span className="flex-1 text-left text-sm whitespace-nowrap">{item.label}</span>
                     {item.expandable && (
                       modelsOpen
                         ? <ChevronDown className="h-3.5 w-3.5 text-[#94A3B8] flex-shrink-0" />

@@ -82,6 +82,8 @@ const GROUPS: Group[] = [
 export function TopBar() {
   const [appSwitcherOpen, setAppSwitcherOpen] = useState(false)
   const switcherRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLElement>(null)
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 })
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -93,23 +95,40 @@ export function TopBar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [appSwitcherOpen])
 
+  function handleToggle() {
+    if (!appSwitcherOpen && headerRef.current) {
+      const headerRect = headerRef.current.getBoundingClientRect()
+      // Align top with bottom of header + body gap (8px padding)
+      const top = headerRect.bottom + 8
+      // Align left with body padding (8px from viewport edge)
+      const left = 8
+      setDropdownPos({ top, left })
+    }
+    setAppSwitcherOpen(o => !o)
+  }
+
   return (
-    <header className="flex h-12 items-center justify-between bg-[#F8FAFC] px-4 flex-shrink-0 w-full">
+    <header ref={headerRef} className="flex h-12 items-center justify-between bg-[#F8FAFC] px-4 pt-1 flex-shrink-0 w-full">
       {/* Left: logo + app name — clicking opens the App Menu */}
-      <div ref={switcherRef} className="relative">
+      <div ref={switcherRef} className="relative flex items-center">
         <button
-          onClick={() => setAppSwitcherOpen(o => !o)}
-          className="flex items-center gap-2 rounded-md px-1.5 py-1 hover:bg-accent transition-colors"
+          onClick={handleToggle}
+          className="flex h-8 items-center gap-2 rounded-md px-1.5 hover:bg-accent transition-colors"
         >
-          <img src="/blue_smile.svg" alt="Logo" className="h-5 w-5 flex-shrink-0" />
+          <img src="/fi-logo.svg" alt="Logo" className="block h-5 w-5 flex-shrink-0" />
           <span className="text-sm font-medium text-foreground">Feedback Intelligence</span>
           <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${appSwitcherOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {appSwitcherOpen && (
           <div
-            className="absolute left-0 top-10 z-50 flex flex-col w-[320px] max-h-[calc(100vh-60px)] rounded-xl border border-black/[0.16] bg-white overflow-hidden"
-            style={{ boxShadow: '0 12px 24px rgba(0,0,0,0.08)' }}
+            className="fixed z-50 flex flex-col w-[320px] rounded-xl border border-black/[0.16] bg-white overflow-hidden"
+            style={{
+              boxShadow: '0 12px 24px rgba(0,0,0,0.08)',
+              top: dropdownPos.top,
+              left: dropdownPos.left,
+              maxHeight: `calc(100vh - ${dropdownPos.top + 8}px)`,
+            }}
           >
             {/* Scrollable app list */}
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-1">

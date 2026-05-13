@@ -32,6 +32,7 @@ export function AppShell({ children, title = 'Dashboard', breadcrumb = ['Feedbac
               breadcrumb={breadcrumb}
               onAskAi={() => setAiPanelOpen(!aiPanelOpen)}
               onToggleSidebar={() => setPanelOpen(!panelOpen)}
+              sidebarOpen={panelOpen}
             />
             <main className="flex-1 overflow-auto bg-[#F8FAFC]">
               {children}
