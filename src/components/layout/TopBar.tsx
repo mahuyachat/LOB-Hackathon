@@ -1,12 +1,82 @@
 import { useRef, useState, useEffect } from 'react'
-import { HelpCircle, Bell, ChevronDown, MessageSquareText, Users, BarChart2, ClipboardCheck, Headphones } from 'lucide-react'
+import {
+  HelpCircle, Bell, ChevronDown,
+  Shield, UserCog, MessageSquare, Sparkles,
+  Bot, GitBranch, Zap, Workflow,
+  Network, Headphones, User, Layers, KeyRound,
+  CalendarClock, Target, ClipboardCheck, TrendingUp, GraduationCap, MessageCircle, Compass, ScanSearch,
+  Play, LayoutDashboard, PieChart, FileBarChart, Activity, Search, Brain,
+  History, MessageSquareText, Globe, Plug, Link2, BookOpen,
+} from 'lucide-react'
 
-const APPS = [
-  { id: 'feedback', label: 'Feedback Intelligence', icon: MessageSquareText, current: true },
-  { id: 'quality', label: 'Quality Management', icon: ClipboardCheck, current: false },
-  { id: 'workforce', label: 'Workforce Management', icon: Users, current: false },
-  { id: 'analytics', label: 'Analytics', icon: BarChart2, current: false },
-  { id: 'agent', label: 'Agent Desktop', icon: Headphones, current: false },
+type App = { label: string; icon: typeof Shield; bg: string }
+type Group = { tint: string; apps: App[] }
+
+const GROUPS: Group[] = [
+  {
+    tint: 'rgba(142,214,238,0.5)',
+    apps: [
+      { label: 'Admin', icon: Shield, bg: 'rgba(142,214,238,0.5)' },
+      { label: 'Supervisor', icon: UserCog, bg: 'rgba(142,214,238,0.5)' },
+      { label: 'Message Center', icon: MessageSquare, bg: 'rgba(142,214,238,0.5)' },
+      { label: 'AI Studio', icon: Sparkles, bg: 'rgba(142,214,238,0.5)' },
+    ],
+  },
+  {
+    tint: 'rgba(171,156,237,0.5)',
+    apps: [
+      { label: 'Cogingy AI', icon: Bot, bg: 'rgba(171,156,237,0.5)' },
+      { label: 'Agent Integration', icon: GitBranch, bg: 'rgba(171,156,237,0.5)' },
+      { label: 'WFI', icon: Zap, bg: 'rgba(171,156,237,0.5)' },
+      { label: 'Neva Studio', icon: Workflow, bg: 'rgba(171,156,237,0.5)' },
+    ],
+  },
+  {
+    tint: 'rgba(255,205,131,0.5)',
+    apps: [
+      { label: 'ACD', icon: Network, bg: 'rgba(255,205,131,0.5)' },
+      { label: 'Agent', icon: Headphones, bg: 'rgba(255,205,131,0.5)' },
+      { label: 'MAX', icon: User, bg: 'rgba(255,205,131,0.5)' },
+      { label: 'Studio', icon: Layers, bg: 'rgba(255,205,131,0.5)' },
+      { label: 'Studio Authentication', icon: KeyRound, bg: 'rgba(255,205,131,0.5)' },
+    ],
+  },
+  {
+    tint: 'rgba(149,221,155,0.5)',
+    apps: [
+      { label: 'Workforce Management', icon: CalendarClock, bg: 'rgba(149,221,155,0.5)' },
+      { label: 'Enhanced Strategic Planner', icon: Target, bg: 'rgba(149,221,155,0.5)' },
+      { label: 'Quality Management', icon: ClipboardCheck, bg: 'rgba(149,221,155,0.5)' },
+      { label: 'Feedback Intelligence', icon: MessageSquareText, bg: 'rgba(149,221,155,0.5)' },
+      { label: 'Performance Management', icon: TrendingUp, bg: 'rgba(149,221,155,0.5)' },
+      { label: 'Coaching', icon: GraduationCap, bg: 'rgba(149,221,155,0.5)' },
+      { label: 'Interaction Hub', icon: MessageCircle, bg: 'rgba(149,221,155,0.5)' },
+      { label: 'My Zone', icon: Compass, bg: 'rgba(149,221,155,0.5)' },
+      { label: 'Desktop Discovery', icon: ScanSearch, bg: 'rgba(149,221,155,0.5)' },
+    ],
+  },
+  {
+    tint: 'rgba(251,182,182,0.5)',
+    apps: [
+      { label: 'Actions', icon: Play, bg: 'rgba(251,182,182,0.5)' },
+      { label: 'Dashboard', icon: LayoutDashboard, bg: 'rgba(251,182,182,0.5)' },
+      { label: 'Analytics', icon: PieChart, bg: 'rgba(251,182,182,0.5)' },
+      { label: 'Reporting', icon: FileBarChart, bg: 'rgba(251,182,182,0.5)' },
+      { label: 'Metric', icon: Activity, bg: 'rgba(251,182,182,0.5)' },
+      { label: 'Self-Service Analytics', icon: Search, bg: 'rgba(251,182,182,0.5)' },
+      { label: 'Enlighten XO', icon: Brain, bg: 'rgba(251,182,182,0.5)' },
+    ],
+  },
+  {
+    tint: 'rgba(198,205,209,0.5)',
+    apps: [
+      { label: 'Performance Management (legacy)', icon: History, bg: 'rgba(198,205,209,0.5)' },
+      { label: 'Digital', icon: Globe, bg: 'rgba(198,205,209,0.5)' },
+      { label: 'Adapters', icon: Plug, bg: 'rgba(198,205,209,0.5)' },
+      { label: 'Connections Hub', icon: Link2, bg: 'rgba(198,205,209,0.5)' },
+      { label: 'Guide', icon: BookOpen, bg: 'rgba(198,205,209,0.5)' },
+    ],
+  },
 ]
 
 export function TopBar() {
@@ -25,7 +95,7 @@ export function TopBar() {
 
   return (
     <header className="flex h-12 items-center justify-between bg-[#F8FAFC] px-4 flex-shrink-0 w-full">
-      {/* Left: logo + app name — clicking opens the app switcher */}
+      {/* Left: logo + app name — clicking opens the App Menu */}
       <div ref={switcherRef} className="relative">
         <button
           onClick={() => setAppSwitcherOpen(o => !o)}
@@ -37,29 +107,51 @@ export function TopBar() {
         </button>
 
         {appSwitcherOpen && (
-          <div className="absolute left-0 top-10 z-50 w-56 rounded-xl border border-[#E2E8F0] bg-white shadow-lg overflow-hidden">
-            <div className="px-3 py-2.5 border-b border-[#F1F5F9]">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#94A3B8]">CXone Apps</p>
+          <div
+            className="absolute left-0 top-10 z-50 flex flex-col w-[320px] max-h-[calc(100vh-60px)] rounded-xl border border-black/[0.16] bg-white overflow-hidden"
+            style={{ boxShadow: '0 12px 24px rgba(0,0,0,0.08)' }}
+          >
+            {/* Scrollable app list */}
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-1">
+              {GROUPS.map((group, gi) => (
+                <div key={gi} className="flex flex-col gap-1">
+                  {group.apps.map(app => {
+                    const Icon = app.icon
+                    return (
+                      <button
+                        key={app.label}
+                        onClick={() => setAppSwitcherOpen(false)}
+                        className="flex items-center gap-2 h-10 px-2 rounded-lg hover:bg-black/[0.04] transition-colors text-left"
+                      >
+                        <span
+                          className="flex h-8 w-8 items-center justify-center rounded-lg flex-shrink-0"
+                          style={{ backgroundColor: app.bg }}
+                        >
+                          <Icon className="h-5 w-5 text-[#1f2937]" strokeWidth={1.75} />
+                        </span>
+                        <span
+                          className="text-[14px] font-medium truncate"
+                          style={{ color: 'rgba(0,0,0,0.8)', lineHeight: '20px' }}
+                        >
+                          {app.label}
+                        </span>
+                      </button>
+                    )
+                  })}
+                  {gi < GROUPS.length - 1 && <div className="h-px bg-black/[0.08] my-1" />}
+                </div>
+              ))}
             </div>
-            <ul className="p-1.5 flex flex-col gap-0.5">
-              {APPS.map(app => {
-                const Icon = app.icon
-                return (
-                  <li key={app.id}>
-                    <button
-                      className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors ${app.current ? 'bg-[#EFF6FF] text-[#1D4ED8]' : 'text-[#334155] hover:bg-[#F8FAFC]'}`}
-                      onClick={() => setAppSwitcherOpen(false)}
-                    >
-                      <Icon className={`h-4 w-4 flex-shrink-0 ${app.current ? 'text-[#378ADD]' : 'text-[#94A3B8]'}`} />
-                      <span className="flex-1 font-medium">{app.label}</span>
-                      {app.current && (
-                        <span className="text-[10px] font-semibold text-[#378ADD]">Active</span>
-                      )}
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
+
+            {/* CXone footer */}
+            <div className="flex items-center justify-center h-16 border-t border-black/[0.1] flex-shrink-0">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[15px] font-semibold tracking-tight text-[#0F172A]">NiCE</span>
+                <span className="flex items-center px-1.5 py-0.5 rounded-md bg-[#126bce] text-white text-[10px] font-bold tracking-wide">
+                  CX<span className="bg-white text-[#126bce] rounded-sm px-0.5 ml-0.5">one</span>
+                </span>
+              </div>
+            </div>
           </div>
         )}
       </div>
