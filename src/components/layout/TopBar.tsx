@@ -140,17 +140,17 @@ export function TopBar() {
                       <button
                         key={app.label}
                         onClick={() => setAppSwitcherOpen(false)}
-                        className="flex items-center gap-2 h-10 px-2 rounded-lg hover:bg-black/[0.04] transition-colors text-left"
+                        className="flex items-center gap-2 h-8 px-2 rounded-lg hover:bg-black/[0.04] transition-colors text-left"
                       >
                         <span
-                          className="flex h-8 w-8 items-center justify-center rounded-lg flex-shrink-0"
+                          className="flex h-6 w-6 items-center justify-center rounded-md flex-shrink-0"
                           style={{ backgroundColor: app.bg }}
                         >
-                          <Icon className="h-5 w-5 text-[#1f2937]" strokeWidth={1.75} />
+                          <Icon className="h-3.5 w-3.5 text-[#1f2937]" strokeWidth={1.75} />
                         </span>
                         <span
-                          className="text-[14px] font-medium truncate"
-                          style={{ color: 'rgba(0,0,0,0.8)', lineHeight: '20px' }}
+                          className="text-[13px] font-medium truncate"
+                          style={{ color: 'rgba(0,0,0,0.8)', lineHeight: '18px' }}
                         >
                           {app.label}
                         </span>
