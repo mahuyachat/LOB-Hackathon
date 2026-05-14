@@ -27,10 +27,10 @@ export function SidebarPanel({ open }: SidebarPanelProps) {
       )}
     >
       {/* Spacer */}
-      <div className="h-3 flex-shrink-0" />
+      <div className="h-2 flex-shrink-0" />
 
       {/* Nav items */}
-      <nav className="flex flex-col gap-0.5 px-1.5 flex-1">
+      <nav className="flex flex-col gap-1 px-1.5 flex-1">
         {NAV_ITEMS.map(item => {
           const Icon = item.icon
           const isSelected = selected === item.id
@@ -45,20 +45,20 @@ export function SidebarPanel({ open }: SidebarPanelProps) {
                 }}
                 title={!open ? item.label : undefined}
                 className={cn(
-                  'flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-sm transition-colors',
+                  'flex w-full items-center gap-2 rounded-md px-2 py-1.5 transition-colors',
                   isSelected
                     ? 'bg-[#EFF6FF] text-[#126bce] font-medium'
                     : 'text-[#334155] hover:bg-[#F8FAFC]'
                 )}
               >
-                <Icon className={cn('h-4 w-4 flex-shrink-0', isSelected ? 'text-[#126bce]' : 'text-[#64748B]')} />
+                <Icon className={cn('h-[15px] w-[15px] flex-shrink-0', isSelected ? 'text-[#126bce]' : 'text-[#64748B]')} strokeWidth={1.75} />
                 {open && (
                   <>
-                    <span className="flex-1 text-left text-sm whitespace-nowrap">{item.label}</span>
+                    <span className="flex-1 text-left text-[13px] whitespace-nowrap">{item.label}</span>
                     {item.expandable && (
                       modelsOpen
-                        ? <ChevronDown className="h-3.5 w-3.5 text-[#94A3B8] flex-shrink-0" />
-                        : <ChevronRight className="h-3.5 w-3.5 text-[#94A3B8] flex-shrink-0" />
+                        ? <ChevronDown className="h-3 w-3 text-[#94A3B8] flex-shrink-0" />
+                        : <ChevronRight className="h-3 w-3 text-[#94A3B8] flex-shrink-0" />
                     )}
                   </>
                 )}
