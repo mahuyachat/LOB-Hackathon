@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
 import { TopBar } from './components/layout/TopBar'
-import { TrendingUp, Minus, ChevronRight, Sparkles, AlertTriangle, LayoutGrid, Megaphone, FileText, Network } from 'lucide-react'
+import { TrendingUp, Minus, ChevronRight, Sparkles, AlertTriangle, LayoutGrid, Megaphone, FileText, Network, Activity } from 'lucide-react'
 import { LandingPage } from './pages/LandingPage'
 import { AdminPage } from './pages/AdminPage'
 import { AnalysisPage } from './pages/AnalysisPage'
@@ -9,6 +9,7 @@ import { CohortPage } from './pages/CohortPage'
 import { InteractionPage } from './pages/InteractionPage'
 import { SurveyFlowPage } from './pages/SurveyFlowPage'
 import { FeedbackIntelligenceDashboard } from './components/feedback-intelligence/FeedbackIntelligenceDashboard'
+import { MonitoringDashboard } from './components/monitoring/MonitoringDashboard'
 
 /* -------------------- Stat card -------------------- */
 function StatCard({ title, value, subtitle, borderColor = '#208337', alert }: {
@@ -372,7 +373,7 @@ export default function App() {
   const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype'>('admin')
   const [page, setPage] = useState<'dashboard' | 'analysis' | 'cohort' | 'interaction'>('dashboard')
   // Active section within the Feedback Intelligence shell (drives the sidebar)
-  const [fiSection, setFiSection] = useState<'dashboard' | 'campaigns' | 'designs' | 'ontology'>('dashboard')
+  const [fiSection, setFiSection] = useState<'dashboard' | 'monitoring' | 'campaigns' | 'designs' | 'ontology'>('dashboard')
 
   // App-switcher routing (nice_world TopBar dropdown).
   const handleAppSwitch = (appLabel: string) => {
@@ -402,7 +403,7 @@ export default function App() {
           onAppSwitch={handleAppSwitch}
         />
         <iframe
-          src="/prototype.html?embed=topbar"
+          src={`${import.meta.env.BASE_URL}prototype.html?embed=topbar`}
           title="Feedback Intelligence prototype"
           style={{ flex: 1, width: '100%', border: 0, display: 'block' }}
         />
@@ -432,16 +433,18 @@ export default function App() {
   // Dashboard renders the native nice_world dashboard; the other three render
   // the prototype screens (own chrome hidden via ?embed=full).
   const FI_NAV_ITEMS = [
-    { id: 'dashboard', label: 'Dashboard',        icon: LayoutGrid },
-    { id: 'campaigns', label: 'Survey Campaigns', icon: Megaphone },
-    { id: 'designs',   label: 'Survey Templates', icon: FileText },
-    { id: 'ontology',  label: 'Ontology',         icon: Network },
+    { id: 'dashboard',  label: 'Dashboard',        icon: LayoutGrid },
+    { id: 'monitoring', label: 'Monitoring',       icon: Activity },
+    { id: 'campaigns',  label: 'Survey Campaigns', icon: Megaphone },
+    { id: 'designs',    label: 'Survey Templates', icon: FileText },
+    { id: 'ontology',   label: 'Ontology',         icon: Network },
   ]
   const FI_TITLES: Record<typeof fiSection, string> = {
-    dashboard: 'Feedback Intelligence Dashboard',
-    campaigns: 'Survey Campaigns',
-    designs:   'Survey Templates',
-    ontology:  'Ontology',
+    dashboard:  'Feedback Intelligence Dashboard',
+    monitoring: 'Monitoring',
+    campaigns:  'Survey Campaigns',
+    designs:    'Survey Templates',
+    ontology:   'Ontology',
   }
 
   return (
@@ -472,10 +475,23 @@ export default function App() {
 
           <FeedbackIntelligenceDashboard />
         </div>
+      ) : fiSection === 'monitoring' ? (
+        <div className="p-6 lg:px-8 bg-[#F8FAFC] flex-1">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-[28px] font-semibold text-[#0f172a] leading-[1.2]">Monitoring</h1>
+            <button
+              onClick={() => setFlow('admin')}
+              className="text-sm font-medium text-[#64748B] hover:text-[#0F172A] bg-transparent transition-colors"
+            >
+              ← Back to Admin
+            </button>
+          </div>
+          <MonitoringDashboard />
+        </div>
       ) : (
         <iframe
           key={fiSection}
-          src={`/prototype.html?embed=full&section=${fiSection}`}
+          src={`${import.meta.env.BASE_URL}prototype.html?embed=full&section=${fiSection}`}
           title={FI_TITLES[fiSection]}
           style={{ width: '100%', height: '100%', border: 0, display: 'block' }}
         />
