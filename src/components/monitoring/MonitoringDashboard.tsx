@@ -19,7 +19,7 @@ export function MonitoringDashboard() {
 
       {/* Topic intent / action monitoring */}
       <section className="space-y-3">
-        <SectionHeading title="Topic Intent / Action Monitoring" note="VU ≥ 32 confirmed · color = signal intensity" />
+        <SectionHeading title="Topic Intent / Action Monitoring" note="Confirmed signals · color = signal intensity" />
         <IntentActionHeatmap />
       </section>
     </div>
@@ -61,7 +61,7 @@ const KPIS: Kpi[] = [
   { label: 'Active Campaigns', value: '18', sub: '3 launched this week' },
   { label: 'Avg Response Rate', value: '55.4%', delta: '↑ +3.2pp', deltaTone: 'pos', sub: 'vs. prior period' },
   { label: 'Total Responses', value: '10,204', delta: '↑ +1,240', deltaTone: 'pos', sub: 'last 30 days' },
-  { label: 'Avg VU Score', value: '31', delta: '↓ -2', deltaTone: 'neg', sub: 'just below 32 threshold' },
+  { label: 'Avg CSAT Score', value: '73', delta: '↑ +4', deltaTone: 'pos', sub: 'vs. prior period' },
 ]
 
 function KpiRow() {
@@ -91,7 +91,7 @@ type Campaign = {
   status: 'Active' | 'Paused' | 'Inactive'
   responseRate: number
   responses: string
-  vu: number
+  csat: number
   topIntent: string
   channel: string
   segment: string
@@ -99,12 +99,12 @@ type Campaign = {
 }
 
 const CAMPAIGNS: Campaign[] = [
-  { name: 'Complaint Resolution Follow-Up',        status: 'Active',   responseRate: 62, responses: '1,240', vu: 34, topIntent: 'Billing Dispute',   channel: 'SMS',       segment: 'Enterprise',         trend: 'up' },
-  { name: 'Cognigy AI Session — Bot Handoff Audit', status: 'Active',   responseRate: 70, responses: '890',   vu: 29, topIntent: 'Flight Disruption', channel: 'WhatsApp',  segment: 'Business Frequent',  trend: 'up' },
-  { name: 'Negative Sentiment Catcher — All Digital', status: 'Active', responseRate: 58, responses: '2,100', vu: 33, topIntent: 'Baggage Claim',     channel: 'Email',     segment: 'Mid-Market',         trend: 'flat' },
-  { name: 'Post-Disruption Recovery — May',         status: 'Active',   responseRate: 81, responses: '1,540', vu: 38, topIntent: 'Flight Disruption', channel: 'SMS',       segment: 'Leisure Repeat',     trend: 'up' },
-  { name: 'Product Feedback — Beta Testers',        status: 'Inactive', responseRate: 41, responses: '320',   vu: 22, topIntent: 'Booking Change',    channel: 'Web Widget', segment: 'First-Time',        trend: 'down' },
-  { name: 'Refund Timeline Pulse',                  status: 'Paused',   responseRate: 47, responses: '610',   vu: 27, topIntent: 'Refund Processing', channel: 'Voice IVR', segment: 'SMB',                trend: 'down' },
+  { name: 'Complaint Resolution Follow-Up',        status: 'Active',   responseRate: 62, responses: '1,240', csat: 81, topIntent: 'Billing Dispute',   channel: 'SMS',       segment: 'Enterprise',         trend: 'up' },
+  { name: 'Cognigy AI Session — Bot Handoff Audit', status: 'Active',   responseRate: 70, responses: '890',   csat: 79, topIntent: 'Flight Disruption', channel: 'WhatsApp',  segment: 'Business Frequent',  trend: 'up' },
+  { name: 'Negative Sentiment Catcher — All Digital', status: 'Active', responseRate: 58, responses: '2,100', csat: 72, topIntent: 'Baggage Claim',     channel: 'Email',     segment: 'Mid-Market',         trend: 'flat' },
+  { name: 'Post-Disruption Recovery — May',         status: 'Active',   responseRate: 81, responses: '1,540', csat: 88, topIntent: 'Flight Disruption', channel: 'SMS',       segment: 'Leisure Repeat',     trend: 'up' },
+  { name: 'Product Feedback — Beta Testers',        status: 'Inactive', responseRate: 41, responses: '320',   csat: 54, topIntent: 'Booking Change',    channel: 'Web Widget', segment: 'First-Time',        trend: 'down' },
+  { name: 'Refund Timeline Pulse',                  status: 'Paused',   responseRate: 47, responses: '610',   csat: 61, topIntent: 'Refund Processing', channel: 'Voice IVR', segment: 'SMB',                trend: 'down' },
 ]
 
 function statusPill(status: Campaign['status']) {
@@ -133,7 +133,7 @@ function CampaignTable() {
       <table className="w-full text-[13px]">
         <thead>
           <tr className="border-b border-[#F1F5F9] bg-[#F8FAFC]">
-            {['Campaign', 'Status', 'Response Rate', 'Responses', 'Avg VU', 'Top Intent', 'Channel', 'Segment', 'Trend'].map(h => (
+            {['Campaign', 'Status', 'Response Rate', 'Responses', 'CSAT', 'Top Intent', 'Channel', 'Segment', 'Trend'].map(h => (
               <th key={h} className="px-4 py-3 text-left text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider whitespace-nowrap">{h}</th>
             ))}
           </tr>
@@ -154,7 +154,7 @@ function CampaignTable() {
                 </div>
               </td>
               <td className="px-4 py-3 text-[#334155]">{c.responses}</td>
-              <td className="px-4 py-3 text-[#334155]">{c.vu}</td>
+              <td className="px-4 py-3 text-[#334155]">{c.csat}</td>
               <td className="px-4 py-3 text-[#334155] whitespace-nowrap">{c.topIntent}</td>
               <td className="px-4 py-3"><span className="inline-flex items-center rounded-full bg-[#EFF6FF] text-[#1d4ed8] text-[11px] px-2 py-0.5 font-medium">{c.channel}</span></td>
               <td className="px-4 py-3 text-[#334155] whitespace-nowrap">{c.segment}</td>
