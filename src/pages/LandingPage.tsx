@@ -2,6 +2,9 @@ import { AppShell } from '../components/layout/AppShell'
 import { ArrowRight, Sparkles, Users } from 'lucide-react'
 
 export function LandingPage({ onSelectFlow }: { onSelectFlow: (flow: 'feedback' | 'agent') => void }) {
+  const handleFeedbackClick = () => {
+    window.location.href = '/prototype.html'
+  }
   return (
     <AppShell title="Feedback Intelligence" breadcrumb={[]}>
       <div className="p-8 bg-[#F8FAFC] flex-1 flex items-center justify-center">
@@ -16,7 +19,7 @@ export function LandingPage({ onSelectFlow }: { onSelectFlow: (flow: 'feedback' 
           <div className="grid grid-cols-2 gap-6">
             {/* Feedback Intelligence Flow */}
             <button
-              onClick={() => onSelectFlow('feedback')}
+              onClick={handleFeedbackClick}
               className="group rounded-xl border-2 border-[#E5E7EB] bg-white p-8 text-left hover:border-[#378ADD] hover:shadow-lg transition-all"
             >
               <div className="flex items-center justify-between mb-4">
