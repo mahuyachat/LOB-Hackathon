@@ -3,13 +3,13 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
-export default defineConfig(({ command }) => ({
-  // Served from the repo subpath on GitHub Pages in production; root in dev.
-  base: command === 'build' ? '/fm-lyra/' : '/',
+export default defineConfig({
+  // Served at the domain root on AWS Amplify.
+  base: '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
-}))
+})
