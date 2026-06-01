@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { ChevronRight, ChevronLeft } from 'lucide-react'
 import { SidebarPanel } from './SidebarPanel'
+import type { SidebarNavItem } from './SidebarPanel'
 import { TopBar } from './TopBar'
 import { PageHeader } from './PageHeader'
 import { AiAssistantPanel } from './AiAssistantPanel'
@@ -8,36 +10,59 @@ interface AppShellProps {
   children: React.ReactNode
   title?: string
   breadcrumb?: string[]
+  onAppSwitch?: (appLabel: string) => void
+  /** Sidebar nav items + controlled selection (optional). */
+  navItems?: SidebarNavItem[]
+  activeNav?: string
+  onNavSelect?: (id: string) => void
 }
 
-export function AppShell({ children, title = 'Dashboard', breadcrumb = ['Feedback Intelligence'] }: AppShellProps) {
+export function AppShell({ children, title = 'Dashboard', breadcrumb = ['Feedback Intelligence'], onAppSwitch, navItems, activeNav, onNavSelect }: AppShellProps) {
   const [aiPanelOpen, setAiPanelOpen] = useState(false)
   const [panelOpen, setPanelOpen] = useState(true)
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#F8FAFC]">
-      <TopBar />
+      <TopBar onAppSwitch={onAppSwitch} />
 
-      {/* Body row */}
-      <div className="flex flex-1 overflow-hidden p-2 pl-2 gap-2">
-        {/* White card containing sidebar + main content */}
-        <div className="flex flex-1 overflow-hidden rounded-xl border border-[#E2E8F0] bg-white min-w-0">
-          {/* Sidebar panel */}
-          <SidebarPanel open={panelOpen} onToggle={() => setPanelOpen(!panelOpen)} />
+      {/* Body row — sidebar + main content as separate rounded cards (like the Admin shell) */}
+      <div className="relative flex flex-1 overflow-hidden p-2 pt-0 gap-2">
+        {/* Sidebar (now its own rounded card) */}
+        <SidebarPanel
+          open={panelOpen}
+          onToggle={() => setPanelOpen(!panelOpen)}
+          items={navItems}
+          activeKey={activeNav}
+          onSelect={onNavSelect}
+        />
 
-          {/* Main content */}
-          <div className="flex flex-1 flex-col overflow-hidden min-w-0">
-            <PageHeader
-              title={title}
-              breadcrumb={breadcrumb}
-              onAskAi={() => setAiPanelOpen(!aiPanelOpen)}
-              onToggleSidebar={() => setPanelOpen(!panelOpen)}
-              sidebarOpen={panelOpen}
-            />
-            <main className="flex-1 overflow-auto bg-[#F8FAFC]">
-              {children}
-            </main>
-          </div>
+        {/* Floating sidebar toggle chevron, on the seam */}
+        <button
+          onClick={() => setPanelOpen(!panelOpen)}
+          title={panelOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+          className="absolute z-20 flex h-5 w-5 items-center justify-center rounded-full bg-white border border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] shadow-sm transition-all outline-none focus:outline-none"
+          style={{
+            left: panelOpen ? '224px' : '56px',
+            top: '20px',
+          }}
+        >
+          {panelOpen
+            ? <ChevronLeft className="h-3 w-3" />
+            : <ChevronRight className="h-3 w-3" />}
+        </button>
+
+        {/* Main content — its own rounded card */}
+        <div className="flex flex-1 flex-col overflow-hidden min-w-0 rounded-xl border border-[#E2E8F0] bg-white">
+          <PageHeader
+            title={title}
+            breadcrumb={breadcrumb}
+            onAskAi={() => setAiPanelOpen(!aiPanelOpen)}
+            onToggleSidebar={() => setPanelOpen(!panelOpen)}
+            sidebarOpen={panelOpen}
+          />
+          <main className="flex-1 overflow-auto bg-[#F8FAFC]">
+            {children}
+          </main>
         </div>
 
         {/* AI Assistant panel */}

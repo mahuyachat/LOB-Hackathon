@@ -8,6 +8,7 @@ import {
   Play, LayoutDashboard, PieChart, FileBarChart, Activity, Search, Brain,
   History, MessageSquareText, Globe, Plug, Link2, BookOpen,
 } from 'lucide-react'
+import { AnimatedSmile } from '../AnimatedSmile'
 
 type App = { label: string; icon: typeof Shield; bg: string }
 type Group = { tint: string; apps: App[] }
@@ -79,7 +80,13 @@ const GROUPS: Group[] = [
   },
 ]
 
-export function TopBar() {
+interface TopBarProps {
+  onAppSwitch?: (appLabel: string) => void
+  /** Label shown in the app-switcher pill (defaults to "Feedback Intelligence"). */
+  appName?: string
+}
+
+export function TopBar({ onAppSwitch, appName = 'Feedback Intelligence' }: TopBarProps = {}) {
   const [appSwitcherOpen, setAppSwitcherOpen] = useState(false)
   const switcherRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLElement>(null)
@@ -115,8 +122,8 @@ export function TopBar() {
           onClick={handleToggle}
           className="flex h-8 items-center gap-2 rounded-md px-1.5 hover:bg-accent transition-colors"
         >
-          <img src="/fi-logo.svg" alt="Logo" className="block h-5 w-5 flex-shrink-0" />
-          <span className="text-sm font-medium text-foreground">Feedback Intelligence</span>
+          <AnimatedSmile size={20} className="block flex-shrink-0" />
+          <span className="text-sm font-medium text-foreground">{appName}</span>
           <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${appSwitcherOpen ? 'rotate-180' : ''}`} />
         </button>
 
@@ -139,7 +146,10 @@ export function TopBar() {
                     return (
                       <button
                         key={app.label}
-                        onClick={() => setAppSwitcherOpen(false)}
+                        onClick={() => {
+                          setAppSwitcherOpen(false)
+                          onAppSwitch?.(app.label)
+                        }}
                         className="flex items-center gap-2 h-8 px-2 rounded-lg hover:bg-black/[0.04] transition-colors text-left"
                       >
                         <span

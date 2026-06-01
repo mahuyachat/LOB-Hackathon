@@ -1,9 +1,9 @@
 import { AppShell } from '../components/layout/AppShell'
 import { ArrowRight, Sparkles, Users } from 'lucide-react'
 
-export function LandingPage({ onSelectFlow }: { onSelectFlow: (flow: 'feedback' | 'agent') => void }) {
+export function LandingPage({ onSelectFlow }: { onSelectFlow: (flow: 'feedback' | 'agent' | 'prototype') => void }) {
   const handleFeedbackClick = () => {
-    window.location.href = '/prototype.html'
+    onSelectFlow('prototype')
   }
   return (
     <AppShell title="Feedback Intelligence" breadcrumb={[]}>

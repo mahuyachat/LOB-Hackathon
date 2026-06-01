@@ -2742,6 +2742,34 @@ button,input,select,textarea,table,th,td{font-family:inherit;font-size:inherit;f
 .app.nav-minimized{
   grid-template-columns: 60px 1fr;                     /* Lyra: 36px item + 12px*2 padding */
 }
+/* Embedded inside the React host shell: host supplies the topbar, so drop
+   the prototype's own header row and render nav + main full height. */
+.app.embed-notopbar{
+  grid-template-rows: 1fr;
+  grid-template-areas: "nav main";
+}
+/* Host sidebar drives sections: drop the prototype's own left nav too. */
+.app.embed-nonav{
+  grid-template-columns: 1fr;
+  grid-template-areas: "header" "main";
+}
+.app.embed-notopbar.embed-nonav{
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  grid-template-areas: "main";
+}
+/* Flatten the inner card when embedded so the host's rounded card is the
+   only container (no nested rounded corners / gray gutter). */
+.app.embed-nonav .main{
+  background: var(--lyra-white);
+  padding: 0;
+  gap: 0;
+}
+.app.embed-nonav .pane{
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
 
 /* ----- Lyra Shell Top Bar (node 17702:7516): 56px, justify-between -----
    Background matches the surrounding canvas (same as sidebar). The topbar and
@@ -10800,8 +10828,20 @@ function WFMPlaceholder({ onOpenSwitcher }) {
 }
 
 function App() {
+  // Embed mode (host React shell supplies the nice_world chrome):
+  //   ?embed=topbar  -> hide the prototype's own topbar
+  //   ?embed=full    -> hide topbar AND left nav (host sidebar drives sections)
+  //   ?section=KEY   -> initial FI section (dashboard|campaigns|designs|ontology)
+  const _params = (typeof window !== "undefined")
+    ? new URLSearchParams(window.location.search)
+    : new URLSearchParams();
+  const EMBED = _params.get("embed");
+  const EMBED_SECTION = _params.get("section");
+  const HIDE_TOPBAR = EMBED === "topbar" || EMBED === "full";
+  const HIDE_NAV = EMBED === "full";
+
   // Route: { product: 'wfm' | 'fi', section: 'campaigns' | ..., view: 'list' | 'create' }
-  const [route, setRoute] = React.useState({ product: "fi", section: "dashboard", view: "list" });
+  const [route, setRoute] = React.useState({ product: "fi", section: EMBED_SECTION || "dashboard", view: "list" });
   const [switcherOpen, setSwitcherOpen] = React.useState(false);
   const [navMinimized, setNavMinimized] = React.useState(false);
   const [toast, setToast] = React.useState(null);
@@ -10905,19 +10945,23 @@ function App() {
   }
 
   return (
-    <div className={`app ${route.product === "fi" ? "fi-shell" : ""} ${switcherOpen ? "open" : ""}${navMinimized ? " nav-minimized" : ""}`}>
-      <Topbar
-        product={product}
-        productAccent={productAccent}
-        onProductClick={() => setSwitcherOpen(!switcherOpen)}
-        onAppSwitcherClick={() => setSwitcherOpen(!switcherOpen)}
-      />
-      <LeftNav items={nav}
-        minimized={navMinimized}
-        onToggleMinimized={() => setNavMinimized(m => !m)}
-        onLeafClick={(leaf) => {
-          if (leaf.key) setRoute({ product: "fi", section: leaf.key, view: "list" });
-        }}/>
+    <div className={`app ${route.product === "fi" ? "fi-shell" : ""} ${switcherOpen ? "open" : ""}${navMinimized ? " nav-minimized" : ""}${HIDE_TOPBAR ? " embed-notopbar" : ""}${HIDE_NAV ? " embed-nonav" : ""}`}>
+      {HIDE_TOPBAR ? null : (
+        <Topbar
+          product={product}
+          productAccent={productAccent}
+          onProductClick={() => setSwitcherOpen(!switcherOpen)}
+          onAppSwitcherClick={() => setSwitcherOpen(!switcherOpen)}
+        />
+      )}
+      {HIDE_NAV ? null : (
+        <LeftNav items={nav}
+          minimized={navMinimized}
+          onToggleMinimized={() => setNavMinimized(m => !m)}
+          onLeafClick={(leaf) => {
+            if (leaf.key) setRoute({ product: "fi", section: leaf.key, view: "list" });
+          }}/>
+      )}
       <div className="main">{content}</div>
 
       {switcherOpen ? (

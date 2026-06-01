@@ -1,11 +1,14 @@
 import { Fragment, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
-import { TrendingUp, Minus, ChevronRight, Sparkles, AlertTriangle } from 'lucide-react'
+import { TopBar } from './components/layout/TopBar'
+import { TrendingUp, Minus, ChevronRight, Sparkles, AlertTriangle, LayoutGrid, Megaphone, FileText, Network } from 'lucide-react'
 import { LandingPage } from './pages/LandingPage'
+import { AdminPage } from './pages/AdminPage'
 import { AnalysisPage } from './pages/AnalysisPage'
 import { CohortPage } from './pages/CohortPage'
 import { InteractionPage } from './pages/InteractionPage'
 import { SurveyFlowPage } from './pages/SurveyFlowPage'
+import { FeedbackIntelligenceDashboard } from './components/feedback-intelligence/FeedbackIntelligenceDashboard'
 
 /* -------------------- Stat card -------------------- */
 function StatCard({ title, value, subtitle, borderColor = '#208337', alert }: {
@@ -366,12 +369,45 @@ function RecommendationsSection() {
 
 /* -------------------- App -------------------- */
 export default function App() {
-  const [flow, setFlow] = useState<'landing' | 'feedback' | 'agent'>('landing')
+  const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype'>('admin')
   const [page, setPage] = useState<'dashboard' | 'analysis' | 'cohort' | 'interaction'>('dashboard')
+  // Active section within the Feedback Intelligence shell (drives the sidebar)
+  const [fiSection, setFiSection] = useState<'dashboard' | 'campaigns' | 'designs' | 'ontology'>('dashboard')
 
-  // Landing page
+  // App-switcher routing (nice_world TopBar dropdown).
+  const handleAppSwitch = (appLabel: string) => {
+    if (appLabel === 'Feedback Intelligence') { setFlow('feedback'); setFiSection('dashboard') }
+    else if (appLabel === 'Admin') setFlow('admin')
+    // other apps: no-op
+  }
+
+  // Entry point — nice_world Admin page (Employees + WEM nav)
+  if (flow === 'admin') {
+    return <AdminPage onAppSwitch={handleAppSwitch} />
+  }
+
+  // Landing page (still reachable, no longer the entry)
   if (flow === 'landing') {
     return <LandingPage onSelectFlow={(selectedFlow) => setFlow(selectedFlow)} />
+  }
+
+  // Prototype flow — the full CXone prototype embedded inside the nice_world
+  // shell. The host supplies the nice_world TopBar; the prototype renders its
+  // own left nav + screens below it (chrome stripped via ?embed=topbar).
+  if (flow === 'prototype') {
+    return (
+      <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#F8FAFC]">
+        <TopBar
+          appName="Feedback Intelligence"
+          onAppSwitch={handleAppSwitch}
+        />
+        <iframe
+          src="/prototype.html?embed=topbar"
+          title="Feedback Intelligence prototype"
+          style={{ flex: 1, width: '100%', border: 0, display: 'block' }}
+        />
+      </div>
+    )
   }
 
   // Agent flow - Survey Flow
@@ -392,48 +428,58 @@ export default function App() {
     return <AnalysisPage onBack={() => setPage('dashboard')} onOpenCohort={() => setPage('cohort')} />
   }
 
+  // Feedback Intelligence shell — one nice_world sidebar drives all sections.
+  // Dashboard renders the native nice_world dashboard; the other three render
+  // the prototype screens (own chrome hidden via ?embed=full).
+  const FI_NAV_ITEMS = [
+    { id: 'dashboard', label: 'Dashboard',        icon: LayoutGrid },
+    { id: 'campaigns', label: 'Survey Campaigns', icon: Megaphone },
+    { id: 'designs',   label: 'Survey Templates', icon: FileText },
+    { id: 'ontology',  label: 'Ontology',         icon: Network },
+  ]
+  const FI_TITLES: Record<typeof fiSection, string> = {
+    dashboard: 'Feedback Intelligence Dashboard',
+    campaigns: 'Survey Campaigns',
+    designs:   'Survey Templates',
+    ontology:  'Ontology',
+  }
+
   return (
-    <AppShell title="Dashboard" breadcrumb={['Feedback Intelligence']}>
-      <div className="p-6 bg-[#F8FAFC] flex-1 space-y-4">
-        {/* Back to landing link */}
-        <button onClick={() => setFlow('landing')} className="text-sm font-medium text-[#2563EB] hover:underline">
-          ← Back to landing
-        </button>
+    <AppShell
+      title={FI_TITLES[fiSection]}
+      breadcrumb={['Feedback Intelligence']}
+      onAppSwitch={handleAppSwitch}
+      navItems={FI_NAV_ITEMS}
+      activeNav={fiSection}
+      onNavSelect={(id) => setFiSection(id as typeof fiSection)}
+    >
+      {fiSection === 'dashboard' ? (
+        <div className="p-6 lg:px-8 bg-[#F8FAFC] flex-1">
+          {/* Title row: page title on the left, navigation on the right */}
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-[28px] font-semibold text-[#0f172a] leading-[1.2]">
+              Feedback Intelligence Dashboard
+            </h1>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setFlow('admin')}
+                className="text-sm font-medium text-[#64748B] hover:text-[#0F172A] bg-transparent transition-colors"
+              >
+                ← Back to Admin
+              </button>
+            </div>
+          </div>
 
-        {/* Top stats */}
-        <div className="grid grid-cols-4 gap-4">
-          <StatCard
-            title="Response Rate"
-            value="67%"
-            subtitle="Are surveys reaching customers?"
-            borderColor="#208337"
-          />
-          <StatCard
-            title="Validation Rate"
-            value="89%"
-            subtitle="Did the AI's read match what customers said?"
-            borderColor="#208337"
-          />
-          <StatCard
-            title="Validation Confidence"
-            value="87%"
-            subtitle="How confident are we in those reads?"
-            borderColor="#208337"
-          />
-          <StatCard
-            title="Hidden Friction Rate"
-            value="14%"
-            subtitle="Low ratings the agent didn't earn"
-            borderColor="#e53935"
-            alert={{ delta: '↑ +10pts vs prior 7 days' }}
-          />
+          <FeedbackIntelligenceDashboard />
         </div>
-
-        {/* Pattern alert → Intent table */}
-        <PatternAlertBar onNavigate={() => setPage('analysis')} />
-        <IntentTrendingTable />
-
-      </div>
+      ) : (
+        <iframe
+          key={fiSection}
+          src={`/prototype.html?embed=full&section=${fiSection}`}
+          title={FI_TITLES[fiSection]}
+          style={{ width: '100%', height: '100%', border: 0, display: 'block' }}
+        />
+      )}
     </AppShell>
   )
 }

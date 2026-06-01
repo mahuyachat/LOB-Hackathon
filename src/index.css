@@ -1,2 +1,32 @@
 @import "tailwindcss";
 @import "../theme.css";
+
+/* Conference Flow Animations */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animate an SVG path drawing in from start to end.
+   Element must set pathLength="1" so dash math is normalized. */
+@keyframes drawLine {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes voice-bar {
+  from {
+    transform: scaleY(0.3);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}

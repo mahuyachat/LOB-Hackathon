@@ -21,30 +21,21 @@ export function PageHeader({ breadcrumb = [], title, onAskAi, onToggleSidebar, s
         >
           <PanelLeftClose className={cn('h-4 w-4 transition-transform', !sidebarOpen && 'scale-x-[-1]')} />
         </button>
+        {/* Breadcrumb = path only. The page's big H1 carries the title, so we
+           do not repeat it here (avoids the title showing twice). */}
         {breadcrumb.map((item, i) => (
           <span key={i} className="flex items-center gap-1.5">
-            <span className="text-[#64748B] hover:text-[#334155] cursor-pointer">{item}</span>
-            <span className="text-[#94A3B8]">/</span>
+            {i > 0 && <span className="text-[#94A3B8]">/</span>}
+            <span className={cn(
+              i === breadcrumb.length - 1 ? 'text-[#1E293B] font-semibold' : 'text-[#64748B] hover:text-[#334155] cursor-pointer'
+            )}>{item}</span>
           </span>
         ))}
-        <h1 className="text-sm font-semibold text-[#1E293B]">{title}</h1>
       </div>
 
-      {/* Right: filters + Ask AI */}
+      {/* Right side - empty for now */}
       <div className="flex items-center gap-2">
-        <button className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#E2E8F0] bg-white px-3 text-sm font-medium text-[#334155] hover:bg-[#F8FAFC] transition-colors">
-          <span>Last 7 days</span>
-          <ChevronDown className="h-3.5 w-3.5 text-[#94A3B8]" />
-        </button>
-        <div className="h-5 w-px bg-[#E2E8F0]" />
-        <button
-          onClick={onAskAi}
-          className="flex h-8 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium text-[#378ADD] hover:bg-[#EFF6FF] transition-colors outline-none focus:outline-none"
-          title="Ask AI"
-        >
-          <Sparkles className="h-4 w-4" />
-          <span>Ask AI</span>
-        </button>
+        {/* Reserved for future actions */}
       </div>
     </div>
   )
