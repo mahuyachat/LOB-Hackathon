@@ -1,0 +1,331 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$metadata": {
+    "name": "Lyra Design System",
+    "product": "NiCE CXone",
+    "version": "Beta",
+    "source": "Lyra Foundations (Beta) — Figma file qyCq4jUOrpYcpHhpNCdgA5",
+    "generatedAt": "2026-05-20"
+  },
+
+  "color": {
+    "$description": "Base color primitives — perceptual luminosity scale 50–950",
+
+    "brand": {
+      "$description": "CXone blue. 500 is the primary brand value.",
+      "50":  { "$value": "#e9f1fc", "$type": "color" },
+      "100": { "$value": "#cfe0f8", "$type": "color" },
+      "200": { "$value": "#a6c6f0", "$type": "color" },
+      "300": { "$value": "#72a6e8", "$type": "color" },
+      "400": { "$value": "#4896ec", "$type": "color" },
+      "500": { "$value": "#3d81e7", "$type": "color", "$description": "Primary brand" },
+      "600": { "$value": "#166cca", "$type": "color", "$description": "Primary pressed" },
+      "700": { "$value": "#185ba4", "$type": "color" },
+      "800": { "$value": "#164479", "$type": "color" },
+      "900": { "$value": "#0c2459", "$type": "color" },
+      "950": { "$value": "#11375f", "$type": "color" }
+    },
+
+    "slate": {
+      "$description": "Primary neutral for surfaces, text, borders.",
+      "50":  { "$value": "#fbfcfe", "$type": "color" },
+      "100": { "$value": "#f5f7f9", "$type": "color" },
+      "200": { "$value": "#eef0f2", "$type": "color" },
+      "300": { "$value": "#d2d8db", "$type": "color" },
+      "400": { "$value": "#a8b3bb", "$type": "color" },
+      "500": { "$value": "#82959e", "$type": "color" },
+      "600": { "$value": "#526b7a", "$type": "color" },
+      "700": { "$value": "#3f5e69", "$type": "color" },
+      "800": { "$value": "#3f4e5d", "$type": "color" },
+      "900": { "$value": "#1d2630", "$type": "color" },
+      "950": { "$value": "#05131a", "$type": "color" }
+    },
+
+    "gray": {
+      "$description": "True neutral gray. Used sparingly for dividers and placeholders.",
+      "50":  { "$value": "#fafafa", "$type": "color" },
+      "100": { "$value": "#f5f5f5", "$type": "color" },
+      "200": { "$value": "#ededed", "$type": "color" },
+      "300": { "$value": "#e5e5e5", "$type": "color" },
+      "400": { "$value": "#cfcfcf", "$type": "color" },
+      "500": { "$value": "#a3a3a3", "$type": "color" },
+      "600": { "$value": "#737373", "$type": "color" },
+      "700": { "$value": "#525252", "$type": "color" },
+      "800": { "$value": "#2e2e2e", "$type": "color" },
+      "900": { "$value": "#141414", "$type": "color" }
+    },
+
+    "red": {
+      "$description": "Destructive / error status.",
+      "50":  { "$value": "#ffecec", "$type": "color" },
+      "100": { "$value": "#ffdbdb", "$type": "color" },
+      "300": { "$value": "#ff9b9b", "$type": "color" },
+      "500": { "$value": "#d83434", "$type": "color" },
+      "600": { "$value": "#bf2323", "$type": "color" },
+      "700": { "$value": "#8a1c1c", "$type": "color" },
+      "900": { "$value": "#331a1a", "$type": "color" }
+    },
+
+    "orange": {
+      "$description": "Warning status.",
+      "50":  { "$value": "#fff2e2", "$type": "color" },
+      "300": { "$value": "#ffc285", "$type": "color" },
+      "500": { "$value": "#ec7000", "$type": "color" },
+      "600": { "$value": "#c45d00", "$type": "color" },
+      "700": { "$value": "#a64f00", "$type": "color" }
+    },
+
+    "yellow": {
+      "$description": "Caution / highlight status.",
+      "50":  { "$value": "#fff8d4", "$type": "color" },
+      "500": { "$value": "#f8a10a", "$type": "color" },
+      "700": { "$value": "#8e6800", "$type": "color" }
+    },
+
+    "green": {
+      "$description": "Success / positive status.",
+      "50":  { "$value": "#e6f7e8", "$type": "color" },
+      "500": { "$value": "#278a33", "$type": "color" },
+      "700": { "$value": "#1c5e25", "$type": "color" }
+    },
+
+    "teal": {
+      "500": { "$value": "#006889", "$type": "color" }
+    },
+
+    "purple": {
+      "$description": "AI surfaces.",
+      "300": { "$value": "#b59cd9", "$type": "color" },
+      "500": { "$value": "#7856ba", "$type": "color" },
+      "700": { "$value": "#4d3a7a", "$type": "color" }
+    },
+
+    "pink": {
+      "500": { "$value": "#b53389", "$type": "color" }
+    },
+
+    "black": { "$value": "#000000", "$type": "color" },
+    "white": { "$value": "#ffffff", "$type": "color" }
+  },
+
+  "semantic": {
+    "$description": "Semantic / themeable tokens — reference primitives above.",
+
+    "bg": {
+      "surface": {
+        "base":             { "$value": "{color.white}",      "$type": "color", "$description": "Primary page background" },
+        "container":        { "$value": "{color.white}",      "$type": "color", "$description": "Card / panel background" },
+        "containerSubtle":  { "$value": "{color.slate.100}",  "$type": "color" },
+        "overlay":          { "$value": "{color.white}",      "$type": "color", "$description": "Modal / popover background" },
+        "canvas":           { "$value": "{color.slate.50}",   "$type": "color" },
+        "shell":            { "$value": "{color.slate.100}",  "$type": "color", "$description": "App shell canvas" },
+        "backdrop":         { "$value": "rgba(0,0,0,0.40)",   "$type": "color" },
+        "inverse":          { "$value": "{color.slate.900}",  "$type": "color" }
+      },
+      "primary":        { "$value": "{color.brand.600}",  "$type": "color" },
+      "primaryHover":   { "$value": "{color.brand.700}",  "$type": "color" },
+      "destructive":    { "$value": "{color.red.600}",    "$type": "color" },
+      "secondary":      { "$value": "{color.slate.200}",  "$type": "color" },
+      "field":          { "$value": "{color.white}",      "$type": "color" },
+      "ai":             { "$value": "#f4eefb",            "$type": "color", "$description": "Lavender wash for AI surfaces" },
+      "control":        { "$value": "{color.slate.300}",  "$type": "color" },
+      "controlSubtle":  { "$value": "rgba(0,0,0,0.08)",   "$type": "color" },
+      "disabled":       { "$value": "rgba(0,0,0,0.06)",   "$type": "color" },
+      "none":           { "$value": "transparent",        "$type": "color" },
+      "active": {
+        "strong":   { "$value": "{color.brand.600}",  "$type": "color" },
+        "moderate": { "$value": "#d3e6fd",            "$type": "color" },
+        "subtle":   { "$value": "{color.brand.50}",   "$type": "color" }
+      },
+      "state": {
+        "hover":    { "$value": "rgba(0,0,0,0.04)", "$type": "color" },
+        "pressed":  { "$value": "rgba(0,0,0,0.08)", "$type": "color" }
+      }
+    },
+
+    "fg": {
+      "default":         { "$value": "rgba(0,0,0,0.80)",  "$type": "color", "$description": "Primary text and icons" },
+      "secondary":       { "$value": "rgba(0,0,0,0.64)",  "$type": "color", "$description": "Muted / supporting text" },
+      "action":          { "$value": "{color.brand.600}", "$type": "color" },
+      "disabled":        { "$value": "rgba(0,0,0,0.36)",  "$type": "color" },
+      "link":            { "$value": "{color.brand.600}", "$type": "color" },
+      "onPrimary":       { "$value": "{color.white}",     "$type": "color" },
+      "onDestructive":   { "$value": "{color.white}",     "$type": "color" },
+      "inverse":         { "$value": "{color.white}",     "$type": "color" },
+      "inverseDisabled": { "$value": "rgba(255,255,255,0.45)", "$type": "color" },
+      "activeStrong":    { "$value": "{color.brand.700}", "$type": "color" },
+      "activeSubtle":    { "$value": "{color.white}",     "$type": "color" },
+      "success":         { "$value": "{color.green.700}", "$type": "color" },
+      "warning":         { "$value": "{color.orange.700}","$type": "color" },
+      "destructive":     { "$value": "{color.red.600}",   "$type": "color" },
+      "ai":              { "$value": "{color.purple.700}","$type": "color" }
+    },
+
+    "border": {
+      "subtle":       { "$value": "rgba(0,0,0,0.10)",  "$type": "color" },
+      "soft":         { "$value": "rgba(0,0,0,0.16)",  "$type": "color" },
+      "medium":       { "$value": "rgba(0,0,0,0.16)",  "$type": "color" },
+      "strong":       { "$value": "rgba(0,0,0,0.28)",  "$type": "color" },
+      "disabled":     { "$value": "rgba(0,0,0,0.10)",  "$type": "color" },
+      "none":         { "$value": "transparent",        "$type": "color" },
+      "active":       { "$value": "{color.brand.600}", "$type": "color" },
+      "inverse":      { "$value": "rgba(255,255,255,0.20)", "$type": "color" },
+      "focusDefault": { "$value": "{color.brand.500}", "$type": "color" },
+      "focusInverse": { "$value": "{color.white}",     "$type": "color" }
+    }
+  },
+
+  "radius": {
+    "$description": "Lyra border-radius scale.",
+    "xs":    { "$value": "4px",    "$type": "dimension" },
+    "sm":    { "$value": "6px",    "$type": "dimension" },
+    "md":    { "$value": "8px",    "$type": "dimension" },
+    "lg":    { "$value": "12px",   "$type": "dimension" },
+    "xl":    { "$value": "16px",   "$type": "dimension" },
+    "round": { "$value": "9999px", "$type": "dimension" }
+  },
+
+  "spacing": {
+    "$description": "4px base scale.",
+    "0":  { "$value": "0px",  "$type": "dimension" },
+    "1":  { "$value": "4px",  "$type": "dimension" },
+    "2":  { "$value": "8px",  "$type": "dimension" },
+    "3":  { "$value": "12px", "$type": "dimension" },
+    "4":  { "$value": "16px", "$type": "dimension" },
+    "5":  { "$value": "20px", "$type": "dimension" },
+    "6":  { "$value": "24px", "$type": "dimension" },
+    "8":  { "$value": "32px", "$type": "dimension" },
+    "10": { "$value": "40px", "$type": "dimension" },
+    "12": { "$value": "48px", "$type": "dimension" },
+    "16": { "$value": "64px", "$type": "dimension" }
+  },
+
+  "elevation": {
+    "$description": "5-tier shadow scale from Lyra /Effects.",
+    "1": { "$value": "0px 1px 2px 0px rgba(16,24,40,0.06)", "$type": "shadow" },
+    "2": { "$value": "0px 1px 2px 0px rgba(16,24,40,0.15), 0px 1px 3px 0px rgba(16,24,40,0.30)", "$type": "shadow" },
+    "3": { "$value": "0px 4px 6px -2px rgba(16,24,40,0.05), 0px 12px 16px -4px rgba(16,24,40,0.12)", "$type": "shadow" },
+    "4": { "$value": "0px 8px 8px -4px rgba(16,24,40,0.04), 0px 20px 24px -4px rgba(16,24,40,0.14)", "$type": "shadow" },
+    "5": { "$value": "0px 24px 48px -12px rgba(16,24,40,0.32)", "$type": "shadow" }
+  },
+
+  "shadow": {
+    "$description": "Named shadow tiers for overlays and cards.",
+    "sm": { "$value": "0px 1px 2px 0px rgba(0,0,0,0.08)",   "$type": "shadow" },
+    "md": { "$value": "0px 4px 8px 0px rgba(0,0,0,0.08)",   "$type": "shadow" },
+    "lg": { "$value": "0px 12px 24px 0px rgba(0,0,0,0.08)", "$type": "shadow" }
+  },
+
+  "typography": {
+    "$description": "Inter for everything. Lyra prescribes no other typefaces.",
+
+    "fontFamily": {
+      "sans":    { "$value": "\"Inter\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif", "$type": "fontFamily" },
+      "display": { "$value": "\"Inter\", sans-serif", "$type": "fontFamily" },
+      "mono":    { "$value": "ui-monospace, \"SF Mono\", \"Cascadia Code\", Menlo, Consolas, monospace", "$type": "fontFamily" }
+    },
+
+    "scale": {
+      "headingXl": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{typography.fontFamily.sans}",
+          "fontWeight": "600",
+          "fontSize": "24px",
+          "lineHeight": "28px",
+          "letterSpacing": "-0.02rem"
+        }
+      },
+      "headingLg": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{typography.fontFamily.sans}",
+          "fontWeight": "600",
+          "fontSize": "20px",
+          "lineHeight": "24px",
+          "letterSpacing": "-0.01rem"
+        }
+      },
+      "headingMd": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{typography.fontFamily.sans}",
+          "fontWeight": "500",
+          "fontSize": "16px",
+          "lineHeight": "24px",
+          "letterSpacing": "-0.01rem"
+        }
+      },
+      "headingSm": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{typography.fontFamily.sans}",
+          "fontWeight": "500",
+          "fontSize": "14px",
+          "lineHeight": "20px",
+          "letterSpacing": "0"
+        }
+      },
+      "headingXs": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{typography.fontFamily.sans}",
+          "fontWeight": "500",
+          "fontSize": "12px",
+          "lineHeight": "16px",
+          "letterSpacing": "0.01rem",
+          "textTransform": "uppercase"
+        }
+      },
+      "bodyLg": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{typography.fontFamily.sans}",
+          "fontWeight": "400",
+          "fontSize": "16px",
+          "lineHeight": "24px",
+          "letterSpacing": "-0.01rem"
+        }
+      },
+      "bodyMd": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{typography.fontFamily.sans}",
+          "fontWeight": "400",
+          "fontSize": "14px",
+          "lineHeight": "20px",
+          "letterSpacing": "0"
+        },
+        "$description": "Default body text"
+      },
+      "bodySm": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{typography.fontFamily.sans}",
+          "fontWeight": "400",
+          "fontSize": "12px",
+          "lineHeight": "16px",
+          "letterSpacing": "0.01rem"
+        }
+      },
+      "label": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{typography.fontFamily.sans}",
+          "fontWeight": "500",
+          "fontSize": "14px",
+          "lineHeight": "20px",
+          "letterSpacing": "0"
+        }
+      }
+    }
+  },
+
+  "focus": {
+    "ring": {
+      "$value": "0 0 0 2px {semantic.bg.surface.base}, 0 0 0 4px {semantic.border.focusDefault}",
+      "$type": "shadow",
+      "$description": "Standard keyboard focus ring"
+    }
+  }
+}
