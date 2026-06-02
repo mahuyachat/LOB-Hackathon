@@ -1,7 +1,7 @@
 import { ArrowRight, Users, Sparkles } from 'lucide-react'
 import { AnimatedSmile } from '../components/AnimatedSmile'
 
-export function LandingPage({ onSelectFlow }: { onSelectFlow: (flow: 'feedback' | 'agent') => void }) {
+export function LandingPage({ onSelectFlow }: { onSelectFlow: (flow: 'admin' | 'agent') => void }) {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
       {/* Top Navigation */}
@@ -47,9 +47,9 @@ export function LandingPage({ onSelectFlow }: { onSelectFlow: (flow: 'feedback' 
               </div>
             </button>
 
-            {/* Feedback Intelligence Flow → the current FI app (Operations dashboard) */}
+            {/* Feedback Intelligence Flow → Admin first, then app-switcher to FI */}
             <button
-              onClick={() => onSelectFlow('feedback')}
+              onClick={() => onSelectFlow('admin')}
               className="group rounded-xl border-2 border-[#E5E7EB] bg-white p-8 text-left hover:border-[#378ADD] hover:shadow-lg transition-all"
             >
               <div className="flex items-center justify-between">

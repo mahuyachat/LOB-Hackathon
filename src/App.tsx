@@ -398,9 +398,9 @@ export default function App() {
     // other apps: no-op
   }
 
-  // Entry point — nice_world Admin page (Employees + WEM nav)
+  // Admin page (Employees + WEM nav). Reached from the landing's FI card.
   if (flow === 'admin') {
-    return <AdminPage onAppSwitch={handleAppSwitch} />
+    return <AdminPage onAppSwitch={handleAppSwitch} onBackToLanding={() => setFlow('landing')} />
   }
 
   // Landing page (still reachable, no longer the entry)
@@ -417,6 +417,7 @@ export default function App() {
         <TopBar
           appName="Feedback Intelligence"
           onAppSwitch={handleAppSwitch}
+          onBackToLanding={() => setFlow('landing')}
         />
         <iframe
           src="/prototype.html?embed=topbar"
@@ -492,6 +493,7 @@ export default function App() {
       title={FI_TITLES[fiSection]}
       breadcrumb={['Feedback Intelligence']}
       onAppSwitch={handleAppSwitch}
+      onBackToLanding={() => setFlow('landing')}
       navItems={FI_NAV_ITEMS}
       activeNav={fiSection}
       onNavSelect={(id) => {

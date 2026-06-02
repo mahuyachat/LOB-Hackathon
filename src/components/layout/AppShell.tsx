@@ -11,19 +11,20 @@ interface AppShellProps {
   title?: string
   breadcrumb?: string[]
   onAppSwitch?: (appLabel: string) => void
+  onBackToLanding?: () => void
   /** Sidebar nav items + controlled selection (optional). */
   navItems?: SidebarNavItem[]
   activeNav?: string
   onNavSelect?: (id: string) => void
 }
 
-export function AppShell({ children, title = 'Dashboard', breadcrumb = ['Feedback Intelligence'], onAppSwitch, navItems, activeNav, onNavSelect }: AppShellProps) {
+export function AppShell({ children, title = 'Dashboard', breadcrumb = ['Feedback Intelligence'], onAppSwitch, onBackToLanding, navItems, activeNav, onNavSelect }: AppShellProps) {
   const [aiPanelOpen, setAiPanelOpen] = useState(false)
   const [panelOpen, setPanelOpen] = useState(true)
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#F8FAFC]">
-      <TopBar onAppSwitch={onAppSwitch} />
+      <TopBar onAppSwitch={onAppSwitch} onBackToLanding={onBackToLanding} />
 
       {/* Body row — sidebar + main content as separate rounded cards (like the Admin shell) */}
       <div className="relative flex flex-1 overflow-hidden p-2 pt-0 gap-2">

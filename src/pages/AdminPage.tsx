@@ -90,13 +90,14 @@ const EMPLOYEES: Employee[] = [
 
 interface Props {
   onAppSwitch?: (appLabel: string) => void
+  onBackToLanding?: () => void
 }
 
-export function AdminPage({ onAppSwitch }: Props) {
+export function AdminPage({ onAppSwitch, onBackToLanding }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   return (
     <div className="h-screen w-screen flex flex-col bg-[#F8FAFC] overflow-hidden">
-      <TopBar appName="Admin" onAppSwitch={onAppSwitch} />
+      <TopBar appName="Admin" onAppSwitch={onAppSwitch} onBackToLanding={onBackToLanding} />
       <div className="relative flex flex-1 overflow-hidden gap-2 p-2 pt-0">
         {/* Sidebar — rounded card */}
         <AdminSidebar open={sidebarOpen} />

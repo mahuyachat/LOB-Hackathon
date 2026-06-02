@@ -84,9 +84,11 @@ interface TopBarProps {
   onAppSwitch?: (appLabel: string) => void
   /** Label shown in the app-switcher pill (defaults to "Feedback Intelligence"). */
   appName?: string
+  /** When provided, the smile logo becomes a Home button back to the landing page. */
+  onBackToLanding?: () => void
 }
 
-export function TopBar({ onAppSwitch, appName = 'Feedback Intelligence' }: TopBarProps = {}) {
+export function TopBar({ onAppSwitch, appName = 'Feedback Intelligence', onBackToLanding }: TopBarProps = {}) {
   const [appSwitcherOpen, setAppSwitcherOpen] = useState(false)
   const switcherRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLElement>(null)
@@ -116,13 +118,23 @@ export function TopBar({ onAppSwitch, appName = 'Feedback Intelligence' }: TopBa
 
   return (
     <header ref={headerRef} className="flex h-12 items-center justify-between bg-[#F8FAFC] px-4 pt-1 flex-shrink-0 w-full">
-      {/* Left: logo + app name — clicking opens the App Menu */}
-      <div ref={switcherRef} className="relative flex items-center">
+      {/* Left: logo (Home) + app name (App Menu) */}
+      <div ref={switcherRef} className="relative flex items-center gap-0.5">
+        {onBackToLanding && (
+          <button
+            onClick={onBackToLanding}
+            title="Back to landing"
+            aria-label="Back to landing"
+            className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent transition-colors outline-none focus:outline-none"
+          >
+            <AnimatedSmile size={20} className="block flex-shrink-0" />
+          </button>
+        )}
         <button
           onClick={handleToggle}
           className="flex h-8 items-center gap-2 rounded-md px-1.5 hover:bg-accent transition-colors"
         >
-          <AnimatedSmile size={20} className="block flex-shrink-0" />
+          {!onBackToLanding && <AnimatedSmile size={20} className="block flex-shrink-0" />}
           <span className="text-sm font-medium text-foreground">{appName}</span>
           <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${appSwitcherOpen ? 'rotate-180' : ''}`} />
         </button>
