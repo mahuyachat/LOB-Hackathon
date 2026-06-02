@@ -7,7 +7,8 @@ import { AdminPage } from './pages/AdminPage'
 import { AnalysisPage } from './pages/AnalysisPage'
 import { CohortPage } from './pages/CohortPage'
 import { InteractionPage } from './pages/InteractionPage'
-import { SurveyFlowPage } from './pages/SurveyFlowPage'
+// @ts-ignore — self-contained JSX emulator (phone survey) brought from nice_world
+import FeedbackIntelligenceDemo from './components/FeedbackIntelligenceDemo'
 import { CampaignMonitorPage } from './pages/CampaignMonitorPage'
 import { SurveyCampaignMonitoringPage } from './pages/SurveyCampaignMonitoringPage'
 import { SurveyDetailPage } from './pages/SurveyDetailPage'
@@ -375,7 +376,7 @@ function RecommendationsSection() {
 
 /* -------------------- App -------------------- */
 export default function App() {
-  const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype'>('admin')
+  const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype'>('landing')
   const [page, setPage] = useState<'campaign-portfolio' | 'dashboard' | 'analysis' | 'cohort' | 'interaction' | 'campaign-monitor' | 'survey-detail' | 'campaign-insight'>('campaign-portfolio')
   // Active section within the Feedback Intelligence shell (drives the sidebar)
   const [fiSection, setFiSection] = useState<'dashboard' | 'campaigns' | 'designs' | 'ontology'>('dashboard')
@@ -428,7 +429,7 @@ export default function App() {
 
   // Agent flow - Survey Flow
   if (flow === 'agent') {
-    return <SurveyFlowPage onBackToLanding={() => setFlow('landing')} />
+    return <FeedbackIntelligenceDemo onBackToLanding={() => setFlow('landing')} />
   }
 
   // Feedback Intelligence flow
