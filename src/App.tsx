@@ -1,14 +1,20 @@
 import { Fragment, useState } from 'react'
 import { AppShell } from './components/layout/AppShell'
 import { TopBar } from './components/layout/TopBar'
-import { TrendingUp, Minus, ChevronRight, Sparkles, AlertTriangle, LayoutGrid, Megaphone, FileText, Network } from 'lucide-react'
+import { TrendingUp, Minus, ChevronRight, Sparkles, AlertTriangle, Activity, Megaphone, FileText, Network } from 'lucide-react'
 import { LandingPage } from './pages/LandingPage'
 import { AdminPage } from './pages/AdminPage'
 import { AnalysisPage } from './pages/AnalysisPage'
 import { CohortPage } from './pages/CohortPage'
 import { InteractionPage } from './pages/InteractionPage'
 import { SurveyFlowPage } from './pages/SurveyFlowPage'
+import { CampaignMonitorPage } from './pages/CampaignMonitorPage'
+import { SurveyCampaignMonitoringPage } from './pages/SurveyCampaignMonitoringPage'
+import { SurveyDetailPage } from './pages/SurveyDetailPage'
+import { CampaignInsightDashboard } from './components/feedback-intelligence/CampaignInsightDashboard'
 import { FeedbackIntelligenceDashboard } from './components/feedback-intelligence/FeedbackIntelligenceDashboard'
+import { getCampaignById, CAMPAIGNS } from './lib/campaigns'
+import { getSurveyById } from './lib/surveys'
 
 /* -------------------- Stat card -------------------- */
 function StatCard({ title, value, subtitle, borderColor = '#208337', alert }: {
@@ -370,14 +376,24 @@ function RecommendationsSection() {
 /* -------------------- App -------------------- */
 export default function App() {
   const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype'>('admin')
-  const [page, setPage] = useState<'dashboard' | 'analysis' | 'cohort' | 'interaction'>('dashboard')
+  const [page, setPage] = useState<'campaign-portfolio' | 'dashboard' | 'analysis' | 'cohort' | 'interaction' | 'campaign-monitor' | 'survey-detail' | 'campaign-insight'>('campaign-portfolio')
   // Active section within the Feedback Intelligence shell (drives the sidebar)
   const [fiSection, setFiSection] = useState<'dashboard' | 'campaigns' | 'designs' | 'ontology'>('dashboard')
+  // Selected campaign drives Level 2 and Level 3 scoping. Defaults to the
+  // demo star performer so the campaign-context strip always has a value.
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string>(CAMPAIGNS[0].id)
+  const selectedCampaign = getCampaignById(selectedCampaignId)
+  // Selected survey drives the Survey Detail Level 3 page.
+  const [selectedSurveyId, setSelectedSurveyId] = useState<string | null>(null)
+  const selectedSurvey = selectedSurveyId ? getSurveyById(selectedSurveyId) : undefined
 
   // App-switcher routing (nice_world TopBar dropdown).
   const handleAppSwitch = (appLabel: string) => {
-    if (appLabel === 'Feedback Intelligence') { setFlow('feedback'); setFiSection('dashboard') }
-    else if (appLabel === 'Admin') setFlow('admin')
+    if (appLabel === 'Feedback Intelligence') {
+      setFlow('feedback')
+      setFiSection('dashboard')
+      setPage('campaign-portfolio')
+    } else if (appLabel === 'Admin') setFlow('admin')
     // other apps: no-op
   }
 
@@ -416,6 +432,25 @@ export default function App() {
   }
 
   // Feedback Intelligence flow
+  if (page === 'survey-detail' && selectedSurvey) {
+    return (
+      <SurveyDetailPage
+        survey={selectedSurvey}
+        campaign={selectedCampaign}
+        onBack={() => setPage('dashboard')}
+      />
+    )
+  }
+
+  if (page === 'campaign-monitor') {
+    return (
+      <CampaignMonitorPage
+        campaign={selectedCampaign}
+        onBack={() => setPage('dashboard')}
+      />
+    )
+  }
+
   if (page === 'interaction') {
     return <InteractionPage onBack={() => setPage('cohort')} onBackToAnalysis={() => setPage('analysis')} />
   }
@@ -432,13 +467,20 @@ export default function App() {
   // Dashboard renders the native nice_world dashboard; the other three render
   // the prototype screens (own chrome hidden via ?embed=full).
   const FI_NAV_ITEMS = [
-    { id: 'dashboard', label: 'Dashboard',        icon: LayoutGrid },
-    { id: 'campaigns', label: 'Survey Campaigns', icon: Megaphone },
-    { id: 'designs',   label: 'Survey Templates', icon: FileText },
-    { id: 'ontology',  label: 'Ontology',         icon: Network },
+    { id: 'dashboard', label: 'Operations',         icon: Activity },
+    { id: 'campaigns', label: 'Survey Campaigns',   icon: Megaphone },
+    { id: 'designs',   label: 'Survey Templates',   icon: FileText },
+    { id: 'ontology',  label: 'Ontology',           icon: Network },
   ]
   const FI_TITLES: Record<typeof fiSection, string> = {
-    dashboard: 'Feedback Intelligence Dashboard',
+    dashboard:
+      page === 'campaign-portfolio'
+        ? 'Operations Dashboard'
+        : page === 'campaign-insight' && selectedCampaign
+        ? `${selectedCampaign.name} · Campaign Insight`
+        : selectedCampaign
+        ? `${selectedCampaign.name} ${selectedCampaign.version}`
+        : 'Feedback Intelligence Dashboard',
     campaigns: 'Survey Campaigns',
     designs:   'Survey Templates',
     ontology:  'Ontology',
@@ -451,27 +493,98 @@ export default function App() {
       onAppSwitch={handleAppSwitch}
       navItems={FI_NAV_ITEMS}
       activeNav={fiSection}
-      onNavSelect={(id) => setFiSection(id as typeof fiSection)}
+      onNavSelect={(id) => {
+        setFiSection(id as typeof fiSection)
+        // Clicking Dashboard always returns to the portfolio top-level
+        if (id === 'dashboard') setPage('campaign-portfolio')
+      }}
     >
       {fiSection === 'dashboard' ? (
-        <div className="p-6 lg:px-8 bg-[#F8FAFC] flex-1">
-          {/* Title row: page title on the left, navigation on the right */}
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-[28px] font-semibold text-[#0f172a] leading-[1.2]">
-              Feedback Intelligence Dashboard
-            </h1>
-            <div className="flex items-center gap-4">
+        page === 'campaign-portfolio' ? (
+          <SurveyCampaignMonitoringPage
+            onSelectCampaign={(id) => {
+              setSelectedCampaignId(id)
+              setPage('dashboard')
+            }}
+            onBackToAdmin={() => setFlow('admin')}
+          />
+        ) : page === 'campaign-insight' ? (
+          <div className="p-6 lg:px-8 bg-[#F8FAFC] flex-1">
+            {/* Breadcrumb row */}
+            <div className="flex items-center gap-1.5 text-[12px] mb-2">
               <button
-                onClick={() => setFlow('admin')}
-                className="text-sm font-medium text-[#64748B] hover:text-[#0F172A] bg-transparent transition-colors"
+                onClick={() => setPage('campaign-portfolio')}
+                className="text-[#64748b] hover:text-[#0f172a] font-medium transition-colors outline-none focus:outline-none"
               >
-                ← Back to Admin
+                Operations Dashboard
               </button>
+              <ChevronRight className="h-3 w-3 text-[#94a3b8]" />
+              <button
+                onClick={() => setPage('dashboard')}
+                className="text-[#64748b] hover:text-[#0f172a] font-medium transition-colors outline-none focus:outline-none"
+              >
+                {selectedCampaign ? selectedCampaign.name : 'Campaign'}
+              </button>
+              <ChevronRight className="h-3 w-3 text-[#94a3b8]" />
+              <span className="text-[#0f172a] font-medium">Campaign Insight</span>
             </div>
-          </div>
 
-          <FeedbackIntelligenceDashboard />
-        </div>
+            {/* Title row */}
+            <div className="flex items-center justify-between mb-4 gap-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4f46e5] mb-1">
+                  <Sparkles className="h-3 w-3" fill="#6366f1" />
+                  Campaign Insight
+                </div>
+                <h1 className="text-[28px] font-semibold text-[#0f172a] leading-[1.2]">
+                  {selectedCampaign ? selectedCampaign.name : 'Campaign Insight'}
+                </h1>
+              </div>
+            </div>
+
+            <CampaignInsightDashboard />
+          </div>
+        ) : (
+          <div className="p-6 lg:px-8 bg-[#F8FAFC] flex-1">
+            {/* Breadcrumb row */}
+            <div className="flex items-center gap-1.5 text-[12px] mb-2">
+              <button
+                onClick={() => setPage('campaign-portfolio')}
+                className="text-[#64748b] hover:text-[#0f172a] font-medium transition-colors outline-none focus:outline-none"
+              >
+                Operations Dashboard
+              </button>
+              <ChevronRight className="h-3 w-3 text-[#94a3b8]" />
+              <span className="text-[#0f172a] font-medium">
+                {selectedCampaign ? selectedCampaign.name : 'Campaign'}
+              </span>
+            </div>
+
+            {/* Title row: campaign name on the left, navigation actions on the right */}
+            <div className="flex items-center justify-between mb-4 gap-4">
+              <h1 className="text-[28px] font-semibold text-[#0f172a] leading-[1.2]">
+                {selectedCampaign ? selectedCampaign.name : 'Feedback Intelligence Dashboard'}
+              </h1>
+              <div className="flex items-center gap-4 flex-shrink-0">
+                <button
+                  onClick={() => setPage('campaign-insight')}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-[#c7d2fe] bg-[#eef2ff] hover:bg-[#e0e7ff] px-3 py-1.5 text-[12px] font-semibold text-[#4f46e5] transition-colors outline-none focus:outline-none"
+                >
+                  <Sparkles className="h-3.5 w-3.5" fill="#6366f1" />
+                  View Campaign Insight
+                </button>
+              </div>
+            </div>
+
+            <FeedbackIntelligenceDashboard
+              campaign={selectedCampaign}
+              onOpenSurvey={(id) => {
+                setSelectedSurveyId(id)
+                setPage('survey-detail')
+              }}
+            />
+          </div>
+        )
       ) : (
         <iframe
           key={fiSection}

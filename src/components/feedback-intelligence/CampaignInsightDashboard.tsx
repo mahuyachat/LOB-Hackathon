@@ -1,10 +1,5 @@
 import { useState, useMemo, useEffect, useRef, createContext, useContext } from 'react'
-import { Sparkles, Check, X, Pencil, ChevronDown, ArrowLeft } from 'lucide-react'
-import type { Campaign, CampaignStatus } from '@/lib/campaigns'
-import type { Topic } from '@/lib/topics'
-import { getSurveysForCampaign } from '@/lib/surveys'
-import { TopicsTable } from './TopicsTable'
-import { SurveysList } from './SurveysList'
+import { Sparkles, Check, X, Pencil, ChevronDown } from 'lucide-react'
 
 /* Shared visibility flag for all AI insight / recommendation blocks.
    Default false = dashboard shows data only. A transparent top-right
@@ -12,25 +7,14 @@ import { SurveysList } from './SurveysList'
 const InsightsVisibleContext = createContext(false)
 
 /* ============================================================
- * Feedback Intelligence Dashboard — pixel-matched to reference
- *
- * When a `campaign` prop is supplied the dashboard renders a
- * campaign-context strip at the top with back / operations links.
- * Data inside the panels is unchanged for the prototype — the
- * scoping is visual only.
+ * Campaign Insight Dashboard — snapshot of the dashboard from
+ * MVP-Version's last committed revision (commit 46967f2).
+ * Surfaced when the user clicks "View Campaign Insight" from a
+ * per-campaign Level 2 view.
  * ============================================================ */
-export function FeedbackIntelligenceDashboard({
-  campaign,
-  onBackToPortfolio,
-  onViewOperations,
-  onOpenSurvey,
-}: {
-  campaign?: Campaign
-  onBackToPortfolio?: () => void
-  onViewOperations?: () => void
-  onOpenSurvey?: (surveyId: string) => void
-} = {}) {
-  const [showInsights, setShowInsights] = useState(false)
+export function CampaignInsightDashboard() {
+  // AI insights are revealed by default on the Campaign Insight view.
+  const showInsights = true
 
   // Staggered entry — cards first, then the chart card, then the chart
   // line draws inside (handled in ResponseRateChart), then the bottom row.
@@ -47,19 +31,19 @@ export function FeedbackIntelligenceDashboard({
           <FilterRow />
         </div>
 
-        {/* Aggregated KPI tiles — sourced from campaign + topic data */}
-        <div style={enter(100)}>
-          <CampaignKpiTiles campaign={campaign} />
+        {/* 1. KPI cards first */}
+        <div style={enter(0)}>
+          <KpiCards />
         </div>
 
-        {/* Top Topics — full-width rich table with inline drill-down */}
+        {/* 2. Chart card next (line inside draws at +400ms — see ResponseRateChart) */}
         <div style={enter(300)}>
-          <TopTopicsSection campaign={campaign} />
+          <ResponseRateOverTimeCard />
         </div>
 
-        {/* Recent surveys — individual survey records for this campaign */}
-        <div style={enter(400)}>
-          <RecentSurveysSection campaign={campaign} onOpenSurvey={onOpenSurvey} />
+        {/* 3. Lower components last — after the chart line has drawn (~1.6s) */}
+        <div style={enter(1600)}>
+          <BottomInsightsRow />
         </div>
       </div>
     </InsightsVisibleContext.Provider>
@@ -70,179 +54,11 @@ function BottomInsightsRow() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const toggle = (i: number) => () => setOpenIndex(openIndex === i ? null : i)
   return (
-    <div className="grid grid-cols-2 gap-4 items-stretch">
-      <ByCustomerTypePanel expanded={openIndex === 0} onToggle={toggle(0)} />
-      <ByChannelPanel      expanded={openIndex === 1} onToggle={toggle(1)} />
+    <div className="grid grid-cols-3 gap-4 items-stretch">
+      <ByIntentPanel       expanded={openIndex === 0} onToggle={toggle(0)} />
+      <ByCustomerTypePanel expanded={openIndex === 1} onToggle={toggle(1)} />
+      <ByChannelPanel      expanded={openIndex === 2} onToggle={toggle(2)} />
     </div>
-  )
-}
-
-/* ---------- Campaign-level KPI tile strip ---------- */
-function CampaignKpiTiles({ campaign }: { campaign?: Campaign }) {
-  if (!campaign) return null
-
-  const sentSeries = aggregateTopicSeries(campaign, t => t.surveysSentSeries)
-  const respSeries = aggregateTopicSeries(campaign, t => t.responsesSeries)
-  const respRateSeries = campaign.sparkline ?? []
-  const csatSeries = campaign.csatSeries ?? []
-
-  return (
-    <div className="grid grid-cols-4 gap-4">
-      <CampaignKpiTile title="Surveys Sent" data={sentSeries} color="#3b82f6" displayValue="sum" />
-      <CampaignKpiTile title="Responses Received" data={respSeries} color="#0ea5e9" displayValue="sum" />
-      <CampaignKpiTile title="Response Rate" data={respRateSeries} color="#16a34a" displayValue="latest" unit="%" />
-      <CampaignKpiTile title="CSAT" data={csatSeries} color="#f59e0b" displayValue="latest" />
-    </div>
-  )
-}
-
-function aggregateTopicSeries(
-  campaign: Campaign,
-  getter: (t: Topic) => number[]
-): number[] {
-  const topics = campaign.topics
-  if (!topics.length) return []
-  const days = getter(topics[0]).length
-  return Array.from({ length: days }, (_, i) =>
-    topics.reduce((sum, t) => sum + (getter(t)[i] ?? 0), 0)
-  )
-}
-
-function CampaignKpiTile({
-  title,
-  data,
-  color,
-  displayValue,
-  unit = '',
-}: {
-  title: string
-  data: number[]
-  color: string
-  displayValue: 'sum' | 'latest'
-  unit?: string
-}) {
-  if (!data.length) {
-    return (
-      <div className="bg-white border border-[#e2e8f0] rounded-[10px] p-3">
-        <div className="text-[10px] font-medium text-[#94a3b8] uppercase tracking-[0.05em] mb-2">
-          {title}
-        </div>
-        <div className="text-[12px] text-[#94a3b8]">No data</div>
-      </div>
-    )
-  }
-
-  const width = 320
-  const height = 110
-  const padding = { top: 16, right: 10, bottom: 22, left: 28 }
-  const cw = width - padding.left - padding.right
-  const ch = height - padding.top - padding.bottom
-
-  const min = Math.max(
-    0,
-    Math.min(...data) - Math.max(2, (Math.max(...data) - Math.min(...data)) * 0.2)
-  )
-  const max = Math.max(...data) + Math.max(2, (Math.max(...data) - Math.min(...data)) * 0.2)
-  const range = max - min || 1
-  const xs = (i: number) => padding.left + (i / (data.length - 1)) * cw
-  const ys = (v: number) => padding.top + ch - ((v - min) / range) * ch
-
-  const path = data.map((v, i) => `${i === 0 ? 'M' : 'L'} ${xs(i)} ${ys(v)}`).join(' ')
-  const areaPath = `${path} L ${xs(data.length - 1)} ${padding.top + ch} L ${xs(0)} ${padding.top + ch} Z`
-  const gradId = `ck-${title.replace(/\W/g, '').toLowerCase()}-${color.replace('#', '')}`
-
-  const latest = data[data.length - 1]
-  const first = data[0]
-  const total = data.reduce((s, v) => s + v, 0)
-  const headline = displayValue === 'sum' ? total : latest
-  const delta = latest - first
-  const deltaPct = first !== 0 ? Math.round((delta / first) * 100) : 0
-  const deltaColor = delta > 0 ? '#16a34a' : delta < 0 ? '#dc2626' : '#94a3b8'
-
-  return (
-    <div className="bg-white border border-[#e2e8f0] rounded-[10px] p-3">
-      <div className="flex items-baseline justify-between mb-1">
-        <span className="text-[10px] font-medium text-[#94a3b8] uppercase tracking-[0.05em]">
-          {title}
-        </span>
-        <span className="text-[10px] font-semibold tabular-nums" style={{ color: deltaColor }}>
-          {delta > 0 ? '+' : ''}
-          {deltaPct}%
-        </span>
-      </div>
-      <div className="flex items-baseline gap-1 mb-1">
-        <span className="text-[24px] font-bold text-[#0f172a] tabular-nums leading-none">
-          {displayValue === 'sum' ? headline.toLocaleString() : headline}
-        </span>
-        {unit && <span className="text-[13px] text-[#64748b] leading-none">{unit}</span>}
-      </div>
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-[90px]" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity="0.22" />
-            <stop offset="100%" stopColor={color} stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <text x={padding.left - 4} y={padding.top + 4} textAnchor="end" fill="#cbd5e1" fontSize="9">
-          {Math.round(max)}
-        </text>
-        <text x={padding.left - 4} y={padding.top + ch} textAnchor="end" fill="#cbd5e1" fontSize="9">
-          {Math.round(min)}
-        </text>
-        <text x={padding.left} y={height - 6} textAnchor="start" fill="#94a3b8" fontSize="9">
-          Day 1
-        </text>
-        <text x={width - padding.right} y={height - 6} textAnchor="end" fill="#94a3b8" fontSize="9">
-          Today
-        </text>
-        <line
-          x1={padding.left}
-          y1={padding.top + ch}
-          x2={width - padding.right}
-          y2={padding.top + ch}
-          stroke="#e2e8f0"
-          strokeWidth="1"
-        />
-        <path d={areaPath} fill={`url(#${gradId})`} />
-        <path d={path} fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
-        <circle cx={xs(data.length - 1)} cy={ys(latest)} r="3" fill={color} />
-      </svg>
-    </div>
-  )
-}
-
-/* ---------- Top Topics section (campaign-scoped) ---------- */
-function TopTopicsSection({ campaign }: { campaign?: Campaign }) {
-  const topics = campaign?.topics ?? []
-  return (
-    <section>
-      <div className="flex items-baseline justify-between mb-3">
-        <h2 className="text-[16px] font-semibold text-[#0f172a]">
-          Top intents in this campaign
-        </h2>
-        <span className="text-[11px] text-[#94a3b8]">
-          Click a row for 14-day trend breakdown
-        </span>
-      </div>
-      <TopicsTable topics={topics} />
-    </section>
-  )
-}
-
-/* ---------- Recent surveys section (campaign-scoped) ---------- */
-function RecentSurveysSection({
-  campaign,
-  onOpenSurvey,
-}: {
-  campaign?: Campaign
-  onOpenSurvey?: (surveyId: string) => void
-}) {
-  const surveys = campaign ? getSurveysForCampaign(campaign.id) : []
-  return (
-    <SurveysList
-      surveys={surveys}
-      onOpenSurvey={(id) => onOpenSurvey?.(id)}
-    />
   )
 }
 
@@ -1277,7 +1093,78 @@ function ResponseRateChart() {
   )
 }
 
-/* ---------- 4. By Customer Type panel ---------- */
+/* ---------- 4. By Intent panel ---------- */
+type IntentRow = { name: string; pct: number; delta: string; tone: 'up' | 'flat' | 'down' }
+
+const INTENT_ROWS: IntentRow[] = [
+  { name: 'Flight Disruption',     pct: 81, delta: '+26pp', tone: 'up' },
+  { name: 'Billing Dispute',       pct: 74, delta: '+19pp', tone: 'up' },
+  { name: 'Baggage Claim',         pct: 68, delta: '+13pp', tone: 'up' },
+  { name: 'Booking Change',        pct: 56, delta: '+1pp',  tone: 'flat' },
+  { name: 'Seat Upgrade Request',  pct: 44, delta: '-11pp', tone: 'down' },
+  { name: 'General Inquiry',       pct: 38, delta: '-17pp', tone: 'down' },
+]
+
+function ByIntentPanel({ expanded, onToggle }: { expanded: boolean; onToggle: () => void }) {
+  return (
+    <div className="bg-white border border-[#e2e8f0] rounded-[12px] overflow-hidden h-full flex flex-col">
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-[#e2e8f0]">
+        <h3 className="text-[14px] font-semibold text-[#0f172a] mb-0.5 leading-tight">By Intent</h3>
+        <p className="text-[12px] text-[#94a3b8] leading-tight">Response rate per AI-detected topic</p>
+      </div>
+
+      {/* AI insight accordion (renders only when insights are revealed) */}
+      <PanelInsightAccordion
+        expanded={expanded}
+        onToggle={onToggle}
+        collapsed="High-stakes intents respond 2× more than routine calls"
+        insightBullets={[
+          'Flight Disruption and Baggage Claim drive the highest response — passengers are emotionally invested',
+          'Booking Change and Seat Upgrade requests show near-zero engagement delta',
+          'General Inquiry sits 17pp below baseline — lowest motivation to respond',
+        ]}
+        expectedImpact={[
+          'Prioritizing survey campaigns on disruption intents could add 400+ responses/month',
+          'Reducing survey noise on low-intent calls frees up QM review capacity',
+        ]}
+        action="Launch targeted post-disruption survey campaign · Suppress surveys on General Inquiry calls"
+      />
+
+      <div className="p-4 flex-1">
+        {/* Rows */}
+        <div className="space-y-4">
+          {INTENT_ROWS.map(r => <IntentRow key={r.name} row={r} />)}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function IntentRow({ row }: { row: IntentRow }) {
+  const barColor = row.tone === 'up' ? '#3b82f6' : row.tone === 'flat' ? '#93c5fd' : '#bfdbfe'
+  const deltaColor = row.tone === 'up' ? '#16a34a' : row.tone === 'flat' ? '#64748b' : '#dc2626'
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[13px] text-[#0f172a] font-medium leading-none truncate">{row.name}</span>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className="text-[13px] font-semibold text-[#0f172a] leading-none">{row.pct}%</span>
+          <span className="text-[12px] font-semibold leading-none" style={{ color: deltaColor }}>{row.delta}</span>
+        </div>
+      </div>
+      <div className="h-[6px] bg-[#f1f5f9] rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-300"
+          style={{ width: `${row.pct}%`, backgroundColor: barColor }}
+        />
+      </div>
+    </div>
+  )
+}
+
+/* ---------- 5. By Customer Type panel ---------- */
 type CustomerRow = { name: string; pct: number; vs: string; trend: '↑' | '→' | '↓'; tone: 'up' | 'flat' | 'down' }
 
 const CUSTOMER_ROWS: CustomerRow[] = [
@@ -1411,71 +1298,6 @@ function ChannelRowItem({ row }: { row: ChannelRow }) {
           style={{ width: `${row.pct}%`, backgroundColor: barColor }}
         />
       </div>
-    </div>
-  )
-}
-
-/* ---------- Campaign context strip ---------- */
-const CTX_STATUS_STYLES: Record<CampaignStatus, { bg: string; text: string; label: string }> = {
-  active: { bg: '#dcfce7', text: '#15803d', label: 'Active' },
-  paused: { bg: '#fef3c7', text: '#b45309', label: 'Paused' },
-  draft: { bg: '#e2e8f0', text: '#475569', label: 'Draft' },
-  ended: { bg: '#f1f5f9', text: '#64748b', label: 'Ended' },
-}
-
-function CampaignContextStrip({
-  campaign,
-  onBackToPortfolio,
-  onViewOperations,
-}: {
-  campaign: Campaign
-  onBackToPortfolio?: () => void
-  onViewOperations?: () => void
-}) {
-  const s = CTX_STATUS_STYLES[campaign.status]
-  return (
-    <div className="rounded-[10px] bg-white border border-[#e2e8f0] px-4 py-3 flex items-start justify-between gap-4">
-      <div className="flex-1 min-w-0">
-        {onBackToPortfolio && (
-          <button
-            onClick={onBackToPortfolio}
-            className="inline-flex items-center gap-1 text-[12px] font-medium text-[#64748b] hover:text-[#0f172a] mb-2 outline-none focus:outline-none transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to all campaigns
-          </button>
-        )}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[15px] font-semibold text-[#0f172a]">{campaign.name}</span>
-          <span className="text-[13px] text-[#94a3b8] font-medium">{campaign.version}</span>
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold"
-            style={{ backgroundColor: s.bg, color: s.text }}
-          >
-            {s.label}
-          </span>
-          {campaign.daysRunning !== null && (
-            <>
-              <span className="text-[11px] text-[#94a3b8]">·</span>
-              <span className="text-[12px] text-[#64748b]">{campaign.daysRunning} days running</span>
-            </>
-          )}
-          <span className="text-[11px] text-[#94a3b8]">·</span>
-          <span className="text-[12px] text-[#64748b]">{campaign.channels.join(' · ')}</span>
-        </div>
-        <p className="text-[11px] text-[#94a3b8] mt-1 leading-snug">
-          Trigger: {campaign.trigger}
-        </p>
-      </div>
-      {onViewOperations && (
-        <button
-          onClick={onViewOperations}
-          className="inline-flex items-center gap-1.5 rounded-md border border-[#c7d2fe] bg-[#eef2ff] hover:bg-[#e0e7ff] px-3 py-1.5 text-[12px] font-semibold text-[#4f46e5] transition-colors outline-none focus:outline-none flex-shrink-0"
-        >
-          <Sparkles className="h-3.5 w-3.5" fill="#6366f1" />
-          View Campaign Insight
-        </button>
-      )}
     </div>
   )
 }
