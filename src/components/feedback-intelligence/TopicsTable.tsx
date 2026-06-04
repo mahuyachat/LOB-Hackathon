@@ -46,9 +46,6 @@ export function TopicsTable({ topics }: { topics: Topic[] }) {
             <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.05em] text-[#94a3b8]">
               CSAT
             </th>
-            <th className="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.05em] text-[#94a3b8] w-[80px]">
-              Trend
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -107,13 +104,10 @@ function TopicRow({
         <td className="px-5 py-3.5">
           <CsatBadge value={topic.csat} />
         </td>
-        <td className="px-5 py-3.5 text-center">
-          <TrendArrow trend={topic.trend} />
-        </td>
       </tr>
       {expanded && (
         <tr className="border-b border-[#f1f5f9] bg-[#fafbfc]">
-          <td colSpan={9} className="px-5 py-5">
+          <td colSpan={8} className="px-5 py-5">
             <TopicTrendPanel topic={topic} />
           </td>
         </tr>

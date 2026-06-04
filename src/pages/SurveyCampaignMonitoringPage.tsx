@@ -27,12 +27,6 @@ export function SurveyCampaignMonitoringPage({
           <h1 className="text-[32px] font-semibold text-[#0f172a] leading-[1.1] tracking-[-0.02em]">
             Operations Dashboard
           </h1>
-          <button
-            onClick={onBackToAdmin}
-            className="text-[13px] font-medium text-[#64748b] hover:text-[#0F172A] transition-colors outline-none focus:outline-none"
-          >
-            ← Back to Admin
-          </button>
         </div>
 
         <FilterRow />
@@ -173,16 +167,13 @@ function CampaignTable({ onSelectCampaign }: { onSelectCampaign: (id: string) =>
               CSAT
             </th>
             <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.05em] text-[#94a3b8]">
-              Top Topic
+              Emerging Topic
             </th>
             <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.05em] text-[#94a3b8]">
               Channel
             </th>
             <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.05em] text-[#94a3b8]">
               Category
-            </th>
-            <th className="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.05em] text-[#94a3b8] w-[80px]">
-              Trend
             </th>
           </tr>
         </thead>
@@ -200,7 +191,6 @@ function CampaignRow({ campaign, onSelect }: { campaign: Campaign; onSelect: () 
   const topTopic = campaign.topIntents[0] ?? '—'
   const primaryChannel = campaign.channels[0] ?? '—'
   const responses = Math.round(((campaign.sent ?? 0) * (campaign.responseRate ?? 0)) / 100)
-  const trend = campaign.responseDelta?.tone ?? 'flat'
 
   return (
     <tr
@@ -227,9 +217,6 @@ function CampaignRow({ campaign, onSelect }: { campaign: Campaign; onSelect: () 
         <ChannelChip channel={primaryChannel} />
       </td>
       <td className="px-5 py-3.5 text-[#475569]">{campaign.category}</td>
-      <td className="px-5 py-3.5 text-center">
-        <TrendArrow trend={trend} />
-      </td>
     </tr>
   )
 }
