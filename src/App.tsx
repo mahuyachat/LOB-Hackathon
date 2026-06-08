@@ -470,7 +470,7 @@ export default function App() {
     { id: 'dashboard', label: 'Operations',         icon: Activity },
     { id: 'campaigns', label: 'Survey Campaigns',   icon: Megaphone },
     { id: 'designs',   label: 'Survey Templates',   icon: FileText },
-    { id: 'ontology',  label: 'Ontology',           icon: Network },
+    { id: 'ontology',  label: 'Ontology Studio',    icon: Network },
   ]
   const FI_TITLES: Record<typeof fiSection, string> = {
     dashboard:
@@ -483,7 +483,7 @@ export default function App() {
         : 'Feedback Intelligence Dashboard',
     campaigns: 'Survey Campaigns',
     designs:   'Survey Templates',
-    ontology:  'Ontology',
+    ontology:  'Ontology Studio',
   }
 
   return (

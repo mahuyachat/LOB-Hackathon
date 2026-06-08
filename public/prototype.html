@@ -9923,6 +9923,99 @@ const REFRESHED_CATEGORIES = [
   { id: 10, name: "Trust & Transparency",  weight: 5, active: true, isNew: true },
 ];
 
+// Default category set for each Topic AI Model. When the user selects a
+// model in the "Configure new ontology" view, these defaults load with
+// weight = 5 on each category.
+const CATEGORIES_BY_MODEL = {
+  "cx-quality": [
+    { id: 1, name: "Resolution",            weight: 5, active: true },
+    { id: 2, name: "Agent Empathy",         weight: 5, active: true },
+    { id: 3, name: "Customer Effort",       weight: 5, active: true },
+    { id: 4, name: "Wait Time",             weight: 5, active: true },
+    { id: 5, name: "Billing Accuracy",      weight: 5, active: true },
+    { id: 6, name: "Product Knowledge",     weight: 5, active: true },
+    { id: 7, name: "Channel Handoff",       weight: 5, active: true },
+    { id: 8, name: "Communication Clarity", weight: 5, active: true },
+  ],
+  "agent-perf": [
+    { id: 1, name: "First Call Resolution", weight: 5, active: true },
+    { id: 2, name: "Active Listening",      weight: 5, active: true },
+    { id: 3, name: "Knowledge Application", weight: 5, active: true },
+    { id: 4, name: "Tone Management",       weight: 5, active: true },
+    { id: 5, name: "Compliance Adherence",  weight: 5, active: true },
+    { id: 6, name: "Resolution Speed",      weight: 5, active: true },
+  ],
+  "resolution": [
+    { id: 1, name: "Issue Identification",  weight: 5, active: true },
+    { id: 2, name: "Root Cause Analysis",   weight: 5, active: true },
+    { id: 3, name: "Resolution Quality",    weight: 5, active: true },
+    { id: 4, name: "Follow-up Adequacy",    weight: 5, active: true },
+    { id: 5, name: "Customer Confirmation", weight: 5, active: true },
+  ],
+  "effort-ease": [
+    { id: 1, name: "Effort to Reach",       weight: 5, active: true },
+    { id: 2, name: "Steps to Resolve",      weight: 5, active: true },
+    { id: 3, name: "Self-Service Coverage", weight: 5, active: true },
+    { id: 4, name: "Re-contact Need",       weight: 5, active: true },
+    { id: 5, name: "Resolution Time",       weight: 5, active: true },
+  ],
+};
+
+// Default list of already-configured ontologies. Shown on the Ontology
+// Studio landing grid. Replaced by localStorage values if the user has
+// previously published changes.
+const SEED_ONTOLOGIES = [
+  {
+    id: "ont-cx-quality",
+    modelId: "cx-quality",
+    modelName: "CX Quality Model",
+    categories: CATEGORIES_BY_MODEL["cx-quality"].map(c => ({ ...c })),
+    updatedAt: "2026-05-04T14:23:00Z",
+    updatedBy: "Maria Cohen",
+    mappedCampaigns: [
+      "Post-Chat CSAT — Tier 1 Billing",
+      "Cognigy AI Session — Bot Handoff Audit",
+      "NPS Quarterly — Enterprise Clients",
+    ],
+    // Topic AI has published updates to this model after the ontology was
+    // last saved. Drives the "Updates available" badge on the grid and the
+    // info banner in the editor.
+    hasUpstreamChanges: true,
+  },
+  {
+    id: "ont-resolution",
+    modelId: "resolution",
+    modelName: "Resolution Intelligence",
+    categories: CATEGORIES_BY_MODEL["resolution"].map(c => ({ ...c })),
+    updatedAt: "2026-04-22T09:15:00Z",
+    updatedBy: "John Smith",
+    mappedCampaigns: [
+      "Email Support — Resolution Quality",
+      "FCR Check — Tier 2 Support",
+    ],
+  },
+];
+
+// Persistence shim — uses localStorage. Real backend slots in here later.
+const ONTOLOGIES_STORAGE_KEY = "fi-ontologies-v1";
+function loadOntologies() {
+  try {
+    const raw = localStorage.getItem(ONTOLOGIES_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (_) {}
+  return SEED_ONTOLOGIES.map(o => ({ ...o, categories: o.categories.map(c => ({ ...c })) }));
+}
+function saveOntologies(list) {
+  try { localStorage.setItem(ONTOLOGIES_STORAGE_KEY, JSON.stringify(list)); } catch (_) {}
+}
+function formatUpdatedAt(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) +
+    " · " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+}
+
 const SEED_MODIFIERS = [
   { id: 1, name: "Escalation penalty",         when: "Interaction was escalated to supervisor",            effect: "multiply", value: 0.75, active: true },
   { id: 2, name: "Repeat-contact penalty",     when: "Same customer contacted within 72h on same topic",   effect: "multiply", value: 0.80, active: true },
@@ -9942,57 +10035,302 @@ const SEED_SENTIMENT = [
 const CATEGORIES = ["Outcome", "Experience", "Channel", "Loyalty"];
 
 function VUScoreModel() {
-  const [selectedModel, setSelectedModel] = React.useState(TOPIC_MODELS[0].id);
-  const [categories, setCategories] = React.useState(SEED_CATEGORIES);
+  const [ontologies, setOntologies] = React.useState(loadOntologies);
+  // 'list' | 'edit' | 'new'
+  const [view, setView] = React.useState("list");
+  const [editingId, setEditingId] = React.useState(null);
+
+  const editing = editingId ? ontologies.find(o => o.id === editingId) : null;
+
+  const persist = (next) => {
+    setOntologies(next);
+    saveOntologies(next);
+  };
+  const handleEdit = (id) => { setEditingId(id); setView("edit"); };
+  const handleNew  = () => { setEditingId(null); setView("new"); };
+  const handleRemove = (id) => {
+    if (!window.confirm("Remove this ontology configuration?")) return;
+    persist(ontologies.filter(o => o.id !== id));
+  };
+  const handleCancel = () => { setView("list"); setEditingId(null); };
+  const handlePublish = (modelId, categories) => {
+    if (!modelId) return;
+    const now = new Date().toISOString();
+    const model = TOPIC_MODELS.find(m => m.id === modelId);
+    const modelName = model ? model.name : modelId;
+    // Drop transient flags like isNew before persisting
+    const clean = categories.map(({ isNew, ...rest }) => rest);
+    let next;
+    if (view === "edit" && editing) {
+      next = ontologies.map(o =>
+        o.id === editing.id
+          // Publish clears any upstream-changes flag — user has acknowledged them
+          ? { ...o, categories: clean, updatedAt: now, updatedBy: "You", hasUpstreamChanges: false }
+          : o
+      );
+    } else {
+      const existing = ontologies.find(o => o.modelId === modelId);
+      if (existing) {
+        next = ontologies.map(o =>
+          o.id === existing.id
+            ? { ...o, modelName, categories: clean, updatedAt: now, updatedBy: "You", hasUpstreamChanges: false }
+            : o
+        );
+      } else {
+        next = ontologies.concat([{
+          id: "ont-" + Date.now(),
+          modelId, modelName, categories: clean,
+          updatedAt: now, updatedBy: "You",
+          hasUpstreamChanges: false,
+        }]);
+      }
+    }
+    persist(next);
+    setView("list");
+    setEditingId(null);
+  };
+
+  if (view === "list") {
+    return <OntologyList ontologies={ontologies} onEdit={handleEdit} onRemove={handleRemove} onNew={handleNew}/>;
+  }
+  return (
+    <OntologyEditor
+      mode={view}
+      ontology={editing}
+      configuredModelIds={ontologies.map(o => o.modelId)}
+      onCancel={handleCancel}
+      onPublish={handlePublish}
+    />
+  );
+}
+
+function OntologyList({ ontologies, onEdit, onRemove, onNew }) {
+  return (
+    <div className="pane">
+      <div className="pane-head">
+        <h1 style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+          Ontology Studio
+          <span style={{
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            height: 22, minWidth: 22, padding: "0 var(--space-2)",
+            borderRadius: "var(--radius-round)",
+            background: "var(--lyra-slate-200)", color: "var(--lyra-slate-700)",
+            font: "500 12px/16px var(--font-sans)", letterSpacing: "0.01rem",
+          }}>{ontologies.length}</span>
+        </h1>
+        <div className="head-actions">
+          <button className="btn primary" onClick={onNew}>
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Configure New Model
+          </button>
+        </div>
+      </div>
+
+      <div className="table-wrap">
+        <div className="info-banner">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 16v-4M12 8h.01"/>
+          </svg>
+          <span>Each row is the VU-score ontology for a Topic AI Model. Edit a row to update category weights, or configure a new model to add a fresh ontology.</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Topic AI Model</th>
+              <th>Mapped campaigns</th>
+              <th>Last updated</th>
+              <th style={{ width: 52 }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ontologies.map(o => {
+              const mapped = o.mappedCampaigns || [];
+              return (
+                <tr key={o.id}>
+                  <td style={{ maxWidth: 320 }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      <span style={{ font: "500 14px/20px var(--font-sans)", color: "var(--color-fg-default)" }}>
+                        {o.modelName}
+                      </span>
+                      {o.hasUpstreamChanges ? (
+                        <span
+                          title="Topic AI has new updates for this model"
+                          style={{
+                            display: "inline-flex", alignItems: "center", gap: 4,
+                            font: "600 10px/1 var(--font-sans)",
+                            color: "#92400e",
+                            background: "#fef3c7",
+                            border: "1px solid #fde68a",
+                            padding: "4px 8px",
+                            borderRadius: 999,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.06em",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          <svg viewBox="0 0 8 8" width="6" height="6" fill="currentColor">
+                            <circle cx="4" cy="4" r="3"/>
+                          </svg>
+                          Updates available
+                        </span>
+                      ) : null}
+                    </div>
+                    <div style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: 12, fontWeight: 400, lineHeight: "16px", letterSpacing: "0.01rem",
+                      color: "var(--color-fg-secondary)",
+                      marginTop: 4,
+                    }}>
+                      {o.categories.length} categories
+                    </div>
+                  </td>
+                  <td style={{ maxWidth: 320 }}>
+                    {mapped.length === 0 ? (
+                      <span style={{ color: "var(--color-fg-secondary)", fontStyle: "italic" }}>None</span>
+                    ) : (
+                      <React.Fragment>
+                        <div style={{ font: "500 14px/20px var(--font-sans)", color: "var(--color-fg-default)" }}>
+                          {mapped.length} {mapped.length === 1 ? "campaign" : "campaigns"}
+                        </div>
+                        <div style={{
+                          font: "400 12px/16px var(--font-sans)",
+                          color: "var(--color-fg-secondary)",
+                          marginTop: 4, whiteSpace: "normal",
+                        }}>
+                          {mapped.slice(0, 2).join(", ")}
+                          {mapped.length > 2 ? ", +" + (mapped.length - 2) + " more" : ""}
+                        </div>
+                      </React.Fragment>
+                    )}
+                  </td>
+                  <td>
+                    <div>{formatUpdatedAt(o.updatedAt)}</div>
+                    <div style={{ font: "400 12px/16px var(--font-sans)", color: "var(--color-fg-secondary)", marginTop: 4 }}>
+                      by {o.updatedBy}
+                    </div>
+                  </td>
+                  <td style={{ textAlign: "center" }}>
+                    <OntologyRowActions
+                      onEdit={() => onEdit(o.id)}
+                      onRemove={() => onRemove(o.id)}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
+            {ontologies.length === 0 ? (
+              <tr>
+                <td colSpan={4} style={{ padding: "var(--space-6)", textAlign: "center", color: "var(--lyra-slate-400)", font: "400 14px/20px Inter" }}>
+                  No ontology configurations yet. Click <strong>Configure New Model</strong> to create one.
+                </td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function OntologyRowActions({ onEdit, onRemove }) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    if (!open) return;
+    function onDocClick(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [open]);
+  return (
+    <div ref={ref} style={{ position: "relative", display: "inline-flex" }} onClick={e => e.stopPropagation()}>
+      <button className="kebab" onClick={() => setOpen(o => !o)} title="Actions">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none">
+          <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+        </svg>
+      </button>
+      {open && (
+        <div className="row-action-menu">
+          <button className="row-action-item" onClick={() => { onEdit(); setOpen(false); }}>
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+            </svg>
+            Edit
+          </button>
+          <div className="row-action-divider"/>
+          <button className="row-action-item danger" onClick={() => { onRemove(); setOpen(false); }}>
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>
+            </svg>
+            Remove
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OntologyEditor({ mode, ontology, configuredModelIds, onCancel, onPublish }) {
+  const isEdit = mode === "edit";
+  const [selectedModel, setSelectedModel] = React.useState(ontology ? ontology.modelId : "");
+  const [categories, setCategories] = React.useState(
+    ontology ? ontology.categories.map(c => ({ ...c })) : []
+  );
   const [dirty, setDirty] = React.useState(false);
-  // Refresh Model button state: idle → refreshing → done → idle
   const [refreshState, setRefreshState] = React.useState("idle");
-  // Track which category ids were just added by the most recent refresh,
-  // so the UI can flag them as NEW for a short while.
   const [newlyAddedIds, setNewlyAddedIds] = React.useState([]);
 
-  const handleRefreshModel = () => {
-    if (refreshState !== "idle") return;
-    setRefreshState("refreshing");
-    // Simulate Topic AI API latency, then swap the categories list
-    setTimeout(() => {
-      setCategories(REFRESHED_CATEGORIES.map(c => ({ ...c })));
-      setNewlyAddedIds(REFRESHED_CATEGORIES.filter(c => c.isNew).map(c => c.id));
-      setRefreshState("done");
-    }, 1400);
-    // Return the button to idle after 3s and clear the NEW badges after 8s
-    setTimeout(() => setRefreshState("idle"), 4400);
-    setTimeout(() => setNewlyAddedIds([]), 9400);
+  const handleModelChange = (newId) => {
+    setSelectedModel(newId);
+    const defaults = CATEGORIES_BY_MODEL[newId] || [];
+    setCategories(defaults.map(c => ({ ...c, weight: 5 })));
+    setDirty(true);
+    setNewlyAddedIds([]);
   };
 
   const setCategory = (id, patch) => {
     setCategories(prev => prev.map(c => c.id === id ? { ...c, ...patch } : c));
     setDirty(true);
   };
-  const addCategory = () => {
-    const nextId = Math.max(...categories.map(c => c.id)) + 1;
-    setCategories(prev => [...prev, { id: nextId, name: "New category", weight: 5, active: true }]);
-    setDirty(true);
+
+  const handleRefreshModel = () => {
+    if (refreshState !== "idle" || !selectedModel) return;
+    setRefreshState("refreshing");
+    setTimeout(() => {
+      if (selectedModel === "cx-quality") {
+        setCategories(REFRESHED_CATEGORIES.map(c => ({ ...c })));
+        setNewlyAddedIds(REFRESHED_CATEGORIES.filter(c => c.isNew).map(c => c.id));
+        setDirty(true);
+      }
+      setRefreshState("done");
+    }, 1400);
+    setTimeout(() => setRefreshState("idle"), 4400);
+    setTimeout(() => setNewlyAddedIds([]), 9400);
   };
-  const removeCategory = (id) => {
-    setCategories(prev => prev.filter(c => c.id !== id));
-    setDirty(true);
-  };
-  const handleCancel = () => {
-    setCategories(SEED_CATEGORIES);
-    setSelectedModel(TOPIC_MODELS[0].id);
-    setDirty(false);
-  };
+
+  const canPublish = !!selectedModel && categories.length > 0 && (isEdit ? dirty : true);
 
   return (
     <div className="pane" style={{ overflow: "hidden" }}>
-      {/* Page header */}
+      {/* Header */}
       <div className="pane-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-        <h1 style={{ margin: 0 }}>Ontology</h1>
+        <div>
+          <button
+            onClick={onCancel}
+            style={{
+              all: "unset", cursor: "pointer",
+              color: "var(--color-fg-secondary)",
+              font: "500 12px/16px var(--font-sans)",
+              display: "inline-flex", alignItems: "center", gap: 4, marginBottom: 6,
+            }}
+          >
+            ← Back to ontologies
+          </button>
+          <h1 style={{ margin: 0 }}>{isEdit ? "Edit Ontology" : "Configure New Ontology"}</h1>
+        </div>
         <button
-          className="btn"
           onClick={handleRefreshModel}
-          disabled={refreshState !== "idle"}
+          disabled={refreshState !== "idle" || !selectedModel}
           title="Pull the latest categories from Topic AI"
           style={{
             display: "inline-flex", alignItems: "center", gap: 6,
@@ -10002,7 +10340,8 @@ function VUScoreModel() {
             font: "600 12px/16px var(--font-sans)",
             padding: "6px 12px",
             borderRadius: "var(--radius-md)",
-            cursor: refreshState === "idle" ? "pointer" : "default",
+            cursor: refreshState === "idle" && selectedModel ? "pointer" : "default",
+            opacity: !selectedModel ? 0.55 : 1,
           }}
         >
           {refreshState === "done" ? (
@@ -10017,11 +10356,7 @@ function VUScoreModel() {
               <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/>
             </svg>
           )}
-          {refreshState === "refreshing"
-            ? "Refreshing…"
-            : refreshState === "done"
-            ? "Model refreshed"
-            : "Refresh Model"}
+          {refreshState === "refreshing" ? "Refreshing…" : refreshState === "done" ? "Model refreshed" : "Refresh Model"}
         </button>
       </div>
 
@@ -10029,109 +10364,175 @@ function VUScoreModel() {
       <div style={{ flex: 1, overflowY: "auto", padding: "36px 40px 24px" }}>
         <div style={{ width: "80%" }}>
 
-          {/* Topic AI Model selector — field layout */}
+          {/* Upstream changes notice — only in edit mode when Topic AI has new updates */}
+          {isEdit && ontology && ontology.hasUpstreamChanges ? (
+            <div style={{
+              background: "#fffbeb",
+              border: "1px solid #fde68a",
+              borderRadius: "var(--radius-md)",
+              padding: "12px 16px",
+              marginBottom: 24,
+              display: "flex", alignItems: "flex-start", gap: 12,
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <div>
+                <div style={{ font: "600 13px/18px var(--font-sans)", color: "#92400e", marginBottom: 2 }}>
+                  Topic AI has new updates for this model
+                </div>
+                <div style={{ font: "400 13px/18px var(--font-sans)", color: "#78350f" }}>
+                  Click <strong>Refresh Model</strong> at the top right to pull the latest categories before publishing.
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {/* Topic AI Model selector */}
           <div style={{ marginBottom: 40 }}>
             <div style={{ font: "500 11px/16px var(--font-sans)", color: "var(--color-fg-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>
               Choose Topic AI Model
             </div>
-            <select
-              className="ont-model-select"
-              value={selectedModel}
-              onChange={e => { setSelectedModel(e.target.value); setDirty(true); }}>
-              {TOPIC_MODELS.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-            </select>
-            <p style={{ margin: "8px 0 0", font: "400 13px/18px var(--font-sans)", color: "var(--color-fg-secondary)" }}>
-              Defines how each category is weighted when computing the composite VU score.
-            </p>
+            {(() => {
+              // In new mode, only show models that aren't already configured.
+              // In edit mode, the dropdown is disabled so we keep the full list.
+              const availableModels = isEdit
+                ? TOPIC_MODELS
+                : TOPIC_MODELS.filter(m => configuredModelIds.indexOf(m.id) === -1);
+              const nothingLeft = !isEdit && availableModels.length === 0;
+              return (
+                <React.Fragment>
+                  <select
+                    className="ont-model-select"
+                    value={selectedModel}
+                    disabled={isEdit || nothingLeft}
+                    onChange={e => handleModelChange(e.target.value)}
+                    style={(isEdit || nothingLeft) ? { opacity: 0.65, cursor: "not-allowed" } : undefined}
+                  >
+                    {!selectedModel && (
+                      <option value="">
+                        {nothingLeft ? "All Topic AI Models are configured" : "Select a Topic AI Model…"}
+                      </option>
+                    )}
+                    {availableModels.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                  </select>
+                  <p style={{ margin: "8px 0 0", font: "400 13px/18px var(--font-sans)", color: "var(--color-fg-secondary)" }}>
+                    {isEdit
+                      ? "The model is locked while editing this ontology."
+                      : nothingLeft
+                      ? "Every Topic AI Model already has an ontology. Edit an existing row to update its weights."
+                      : "Only models without an ontology yet are shown. Choose one to load its categories with default weight = 5."}
+                  </p>
+                </React.Fragment>
+              );
+            })()}
           </div>
 
-          {/* Section label */}
-          <div style={{ font: "500 11px/16px var(--font-sans)", color: "var(--color-fg-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 16 }}>
-            Define Category Weights
-          </div>
-
-          {/* Categories card grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            {categories.map(c => (
-              <div key={c.id} className={`ont-cat-card${c.active ? "" : " ont-cat-card--inactive"}`}>
-
-                {/* Name + actions row */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-                  <input className="ont-input" value={c.name}
-                    onChange={e => setCategory(c.id, { name: e.target.value })}
-                    style={{ font: "500 15px/20px var(--font-sans)", color: "var(--color-fg-default)", padding: "2px 4px", flex: 1 }}/>
-                  {newlyAddedIds.indexOf(c.id) !== -1 ? (
-                    <span style={{
-                      display: "inline-flex", alignItems: "center",
-                      font: "700 9px/1 var(--font-sans)",
-                      color: "#15803d",
-                      background: "#dcfce7",
-                      border: "1px solid #bbf7d0",
-                      padding: "3px 6px",
-                      borderRadius: "999px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                      flexShrink: 0,
-                    }}>New</span>
-                  ) : null}
-                </div>
-
-                {/* Weight label + badge */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ font: "500 11px/16px var(--font-sans)", color: "var(--color-fg-secondary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                    Weight
-                  </span>
-                  <span style={{
-                    display: "inline-flex", alignItems: "center", justifyContent: "center",
-                    width: 34, height: 28,
-                    font: "700 15px/1 var(--font-sans)",
-                    color: "var(--color-fg-action)",
-                    background: "var(--color-bg-active-moderate)",
-                    borderRadius: "var(--radius-sm)",
-                  }}>{c.weight}</span>
-                </div>
-
-                {/* Slider */}
-                <input type="range" min="1" max="10" value={c.weight}
-                  disabled={!c.active}
-                  onChange={e => setCategory(c.id, { weight: parseInt(e.target.value) })}
-                  style={{ width: "100%", accentColor: "var(--color-border-active)", display: "block" }}/>
-
-                {/* Tick marks + labels combined — each position has its own column */}
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 5, padding: "0 7px" }}>
-                  {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                    <div key={n} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                      <div style={{
-                        width: 1.5,
-                        height: (n === 1 || n === 5 || n === 10) ? 8 : 5,
-                        background: n === c.weight ? "var(--color-border-active)" : "rgba(0,0,0,0.16)",
-                        borderRadius: 1,
-                      }}/>
-                      {(n === 1 || n === 5 || n === 10) && (
-                        <span style={{ font: "400 10px/12px var(--font-sans)", color: n === c.weight ? "var(--color-fg-action)" : "var(--color-fg-secondary)" }}>
-                          {n}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
+          {selectedModel && categories.length > 0 ? (
+            <React.Fragment>
+              {/* Section label */}
+              <div style={{ font: "500 11px/16px var(--font-sans)", color: "var(--color-fg-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 16 }}>
+                Define Category Weights
               </div>
-            ))}
 
-          </div>
+              {/* Categories card grid */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                {categories.map(c => (
+                  <div key={c.id} className={`ont-cat-card${c.active ? "" : " ont-cat-card--inactive"}`}>
+
+                    {/* Name + actions row */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+                      <input className="ont-input" value={c.name}
+                        onChange={e => setCategory(c.id, { name: e.target.value })}
+                        style={{ font: "500 15px/20px var(--font-sans)", color: "var(--color-fg-default)", padding: "2px 4px", flex: 1 }}/>
+                      {newlyAddedIds.indexOf(c.id) !== -1 ? (
+                        <span style={{
+                          display: "inline-flex", alignItems: "center",
+                          font: "700 9px/1 var(--font-sans)",
+                          color: "#15803d",
+                          background: "#dcfce7",
+                          border: "1px solid #bbf7d0",
+                          padding: "3px 6px",
+                          borderRadius: "999px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
+                          flexShrink: 0,
+                        }}>New</span>
+                      ) : null}
+                    </div>
+
+                    {/* Weight label + badge */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                      <span style={{ font: "500 11px/16px var(--font-sans)", color: "var(--color-fg-secondary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                        Weight
+                      </span>
+                      <span style={{
+                        display: "inline-flex", alignItems: "center", justifyContent: "center",
+                        width: 34, height: 28,
+                        font: "700 15px/1 var(--font-sans)",
+                        color: "var(--color-fg-action)",
+                        background: "var(--color-bg-active-moderate)",
+                        borderRadius: "var(--radius-sm)",
+                      }}>{c.weight}</span>
+                    </div>
+
+                    {/* Slider */}
+                    <input type="range" min="1" max="10" value={c.weight}
+                      disabled={!c.active}
+                      onChange={e => setCategory(c.id, { weight: parseInt(e.target.value) })}
+                      style={{ width: "100%", accentColor: "var(--color-border-active)", display: "block" }}/>
+
+                    {/* Tick marks + labels */}
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 5, padding: "0 7px" }}>
+                      {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                        <div key={n} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                          <div style={{
+                            width: 1.5,
+                            height: (n === 1 || n === 5 || n === 10) ? 8 : 5,
+                            background: n === c.weight ? "var(--color-border-active)" : "rgba(0,0,0,0.16)",
+                            borderRadius: 1,
+                          }}/>
+                          {(n === 1 || n === 5 || n === 10) && (
+                            <span style={{ font: "400 10px/12px var(--font-sans)", color: n === c.weight ? "var(--color-fg-action)" : "var(--color-fg-secondary)" }}>
+                              {n}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                  </div>
+                ))}
+              </div>
+            </React.Fragment>
+          ) : (
+            <div style={{
+              border: "1px dashed var(--color-border-soft)",
+              borderRadius: "var(--radius-md)",
+              padding: "32px 24px",
+              textAlign: "center",
+              color: "var(--color-fg-secondary)",
+              font: "400 14px/20px var(--font-sans)",
+            }}>
+              Select a Topic AI Model above to load its categories.
+            </div>
+          )}
 
         </div>
       </div>{/* /scrollable body */}
 
-      {/* Footer — Cancel + Publish */}
+      {/* Footer */}
       <div className="wz-footer">
-        <button className="btn" onClick={handleCancel}>Cancel</button>
-        <button className="clear-link" onClick={() => setCategories(SEED_CATEGORIES)} style={{ marginLeft: 8 }}>Reset to default</button>
+        <button className="btn" onClick={onCancel}>Cancel</button>
         <span style={{ flex: 1 }}/>
-        <button className="btn primary" disabled={!dirty}
-          style={{ opacity: dirty ? 1 : 0.55, cursor: dirty ? "pointer" : "default" }}
-          onClick={() => setDirty(false)}>
+        <button
+          className="btn primary"
+          disabled={!canPublish}
+          style={{ opacity: canPublish ? 1 : 0.55, cursor: canPublish ? "pointer" : "default" }}
+          onClick={() => onPublish(selectedModel, categories)}
+        >
           <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 13 10 19 20 5"/></svg>
           Publish changes
         </button>
