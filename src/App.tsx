@@ -4,6 +4,7 @@ import { TopBar } from './components/layout/TopBar'
 import { TrendingUp, Minus, ChevronRight, Sparkles, AlertTriangle, Activity, Megaphone, FileText, Network } from 'lucide-react'
 import { LandingPage } from './pages/LandingPage'
 import { AdminPage } from './pages/AdminPage'
+import { ExperienceIntelligencePage } from './pages/ExperienceIntelligencePage'
 import { AnalysisPage } from './pages/AnalysisPage'
 import { CohortPage } from './pages/CohortPage'
 import { InteractionPage } from './pages/InteractionPage'
@@ -375,7 +376,7 @@ function RecommendationsSection() {
 
 /* -------------------- App -------------------- */
 export default function App() {
-  const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype'>('admin')
+  const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype' | 'experience-intelligence'>('admin')
   const [page, setPage] = useState<'campaign-portfolio' | 'dashboard' | 'analysis' | 'cohort' | 'interaction' | 'campaign-monitor' | 'survey-detail' | 'campaign-insight'>('campaign-portfolio')
   // Active section within the Feedback Intelligence shell (drives the sidebar)
   const [fiSection, setFiSection] = useState<'dashboard' | 'campaigns' | 'designs' | 'ontology'>('dashboard')
@@ -393,8 +394,15 @@ export default function App() {
       setFlow('feedback')
       setFiSection('dashboard')
       setPage('campaign-portfolio')
+    } else if (appLabel === 'Experience Intelligence') {
+      setFlow('experience-intelligence')
     } else if (appLabel === 'Admin') setFlow('admin')
     // other apps: no-op
+  }
+
+  // Experience Intelligence — standalone app
+  if (flow === 'experience-intelligence') {
+    return <ExperienceIntelligencePage onBackToAdmin={() => setFlow('admin')} />
   }
 
   // Entry point — nice_world Admin page (Employees + WEM nav)

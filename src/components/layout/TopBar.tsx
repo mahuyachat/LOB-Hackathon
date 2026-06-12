@@ -49,6 +49,7 @@ const GROUPS: Group[] = [
       { label: 'Enhanced Strategic Planner', icon: Target, bg: 'rgba(149,221,155,0.5)' },
       { label: 'Quality Management', icon: ClipboardCheck, bg: 'rgba(149,221,155,0.5)' },
       { label: 'Feedback Intelligence', icon: MessageSquareText, bg: 'rgba(149,221,155,0.5)' },
+      { label: 'Experience Intelligence', icon: Brain, bg: 'rgba(149,221,155,0.5)' },
       { label: 'Performance Management', icon: TrendingUp, bg: 'rgba(149,221,155,0.5)' },
       { label: 'Coaching', icon: GraduationCap, bg: 'rgba(149,221,155,0.5)' },
       { label: 'Interaction Hub', icon: MessageCircle, bg: 'rgba(149,221,155,0.5)' },
