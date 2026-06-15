@@ -248,7 +248,7 @@ export function TopicDrilldown({ topicId, cardStatuses, approvedAt, onBack, onAp
             color: '#64748b', fontSize: 13, padding: 0, marginBottom: 10,
           }}
         >
-          <ArrowLeft size={14} /> Back to Social Intelligence Monitoring
+          <ArrowLeft size={14} /> Back to Market Intelligence Monitoring
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', margin: 0 }}>{topic.name}</h1>

@@ -3,7 +3,7 @@ import { LayoutDashboard, Database, ChevronLeft } from 'lucide-react'
 export type EIPage = 'dashboard' | 'recommendations' | 'settings'
 
 const NAV_ITEMS: { id: EIPage; label: string; icon: typeof LayoutDashboard }[] = [
-  { id: 'dashboard', label: 'Social Intelligence Monitoring', icon: LayoutDashboard },
+  { id: 'dashboard', label: 'Market Intelligence Monitoring', icon: LayoutDashboard },
   { id: 'settings', label: 'Data Sources', icon: Database },
 ]
 

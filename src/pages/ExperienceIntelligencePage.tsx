@@ -118,7 +118,7 @@ function DataSourcesPage({ onReset }: { onReset: () => void }) {
     <div style={{ flex: 1, overflowY: 'auto', background: '#f8fafc' }}>
       <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '16px 32px' }}>
         <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#f97316', marginBottom: 4 }}>
-          ✦ Social Intelligence
+          ✦ Market Intelligence
         </div>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', margin: 0 }}>Data Sources</h1>
         <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>
