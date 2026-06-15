@@ -377,7 +377,7 @@ function RecommendationsSection() {
 
 /* -------------------- App -------------------- */
 export default function App() {
-  const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype' | 'experience-intelligence'>('landing')
+  const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype' | 'experience-intelligence'>('admin')
   const [page, setPage] = useState<'campaign-portfolio' | 'dashboard' | 'analysis' | 'cohort' | 'interaction' | 'campaign-monitor' | 'survey-detail' | 'campaign-insight'>('campaign-portfolio')
   // Active section within the Feedback Intelligence shell (drives the sidebar)
   const [fiSection, setFiSection] = useState<'dashboard' | 'campaigns' | 'designs' | 'ontology'>('dashboard')

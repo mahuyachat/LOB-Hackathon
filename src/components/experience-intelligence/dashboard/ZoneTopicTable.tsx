@@ -34,8 +34,14 @@ const URGENCY_STYLE: Record<RecommendationCard['urgency'], { bg: string; text: s
   low: { bg: '#f0fdf4', text: '#15803d', dot: '#22c55e' },
 }
 
-function rowsForZone(zone: Zone): Topic[] {
-  if (zone === 'blind-spot') return blindSpotTopics
+function rowsForZone(zone: Zone, cards: Map<string, RecommendationCard>): Topic[] {
+  if (zone === 'blind-spot') {
+    return [...blindSpotTopics].sort((a, b) => {
+      const scoreA = cards.get(a.id)?.score ?? 0
+      const scoreB = cards.get(b.id)?.score ?? 0
+      return scoreB - scoreA
+    })
+  }
   if (zone === 'private-signal') return privateSignalTopics
   return emergingTopics
 }
@@ -104,7 +110,13 @@ function UrgencyBadge({ urgency }: { urgency: RecommendationCard['urgency'] }) {
 }
 
 export function ZoneTopicTable({ zone, onTopicClick, onOpenRecommendation }: Props) {
-  const rows = rowsForZone(zone)
+  const cardMap = new Map(
+    (zone === 'blind-spot' ? blindSpotTopics : []).map(t => {
+      const c = getCardByTopicId(t.id)
+      return [t.id, c] as [string, RecommendationCard]
+    }).filter(([, c]) => c != null)
+  )
+  const rows = rowsForZone(zone, cardMap)
   const meta = ZONE_META[zone]
 
   const th: React.CSSProperties = {
@@ -141,14 +153,14 @@ export function ZoneTopicTable({ zone, onTopicClick, onOpenRecommendation }: Pro
               {zone === 'emerging' && <th style={th}>{ccHeader}</th>}
               {zone === 'emerging' && <th style={th}>{socialHeader}</th>}
               <th style={th}>Trend</th>
-              {zone === 'blind-spot' && <th style={th}>Urgency</th>}
+              {zone === 'blind-spot' && <th style={th}>Urgency Score</th>}
               {zone === 'blind-spot' && <th style={{ ...th, textAlign: 'right' }}>Action</th>}
               {zone !== 'blind-spot' && <th style={{ ...th, width: 40 }} />}
             </tr>
           </thead>
           <tbody>
             {rows.map((topic, i) => {
-              const card = zone === 'blind-spot' ? getCardByTopicId(topic.id) : undefined
+              const card = zone === 'blind-spot' ? cardMap.get(topic.id) : undefined
               return (
                 <tr
                   key={topic.id}
@@ -199,10 +211,17 @@ export function ZoneTopicTable({ zone, onTopicClick, onOpenRecommendation }: Pro
                     <TrendChip trend={topic.trend} pct={topic.trendPct} />
                   </td>
 
-                  {/* Blind spot: urgency + recommendation link */}
+                  {/* Blind spot: score + urgency */}
                   {zone === 'blind-spot' && (
                     <td style={{ padding: '14px 16px' }}>
-                      {card ? <UrgencyBadge urgency={card.urgency} /> : <span style={{ color: '#cbd5e1' }}>—</span>}
+                      {card ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                          <span style={{ fontSize: 18, fontWeight: 700, color: card.urgency === 'high' ? '#b91c1c' : card.urgency === 'medium' ? '#92400e' : '#15803d', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                            {card.score}
+                          </span>
+                          <UrgencyBadge urgency={card.urgency} />
+                        </div>
+                      ) : <span style={{ color: '#cbd5e1' }}>—</span>}
                     </td>
                   )}
                   {zone === 'blind-spot' && (
