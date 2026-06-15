@@ -392,45 +392,12 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                 Blind Spots — {bsHighCount} high urgency
               </div>
               <ul style={{ margin: 0, padding: '0 0 0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {top4BS.map(topic => {
-                  const card = getCardByTopicId(topic.id)
-                  const urgency = card?.urgency ?? 'medium'
-                  return (
-                    <li key={topic.id} style={{ fontSize: 13, color: '#1e293b', lineHeight: '18px' }}>
-                      <span
-                        onClick={() => onTopicClick(topic.id)}
-                        style={{ cursor: 'pointer', fontWeight: 500, color: '#1e40af', textDecoration: 'underline', textDecorationStyle: 'dotted' }}
-                      >
-                        {topic.name}
-                      </span>
-                      {' '}
-                      <span style={{ fontWeight: 700, color: urgencyColor(urgency), fontSize: 12 }}>
-                        {card?.score}
-                      </span>
-                      {' '}
-                      <span style={{
-                        background: urgencyBg(urgency),
-                        color: urgencyColor(urgency),
-                        border: `1px solid ${urgencyBorder(urgency)}`,
-                        borderRadius: 9999,
-                        padding: '1px 6px',
-                        fontSize: 10,
-                        fontWeight: 600,
-                      }}>
-                        {urgency.toUpperCase()}
-                      </span>
-                    </li>
-                  )
-                })}
+                {top4BS.map(topic => (
+                  <li key={topic.id} style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', lineHeight: '18px' }}>
+                    {topic.name}
+                  </li>
+                ))}
               </ul>
-              <div style={{ marginTop: 4 }}>
-                <span
-                  onClick={() => onTopicClick(bsHighestScoreTopic.id)}
-                  style={{ fontSize: 12, color: '#2563eb', cursor: 'pointer', fontWeight: 500 }}
-                >
-                  View all →
-                </span>
-              </div>
             </div>
 
             {/* RIGHT — 2×2 stat tiles */}
@@ -578,45 +545,12 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                 Emerging Topics — {emergingTopics.length} confirmed
               </div>
               <ul style={{ margin: 0, padding: '0 0 0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {sortedEmerging.map(topic => {
-                  const card = getCardByTopicId(topic.id)
-                  const urgency = card?.urgency ?? 'medium'
-                  return (
-                    <li key={topic.id} style={{ fontSize: 13, color: '#1e293b', lineHeight: '18px' }}>
-                      <span
-                        onClick={() => onTopicClick(topic.id)}
-                        style={{ cursor: 'pointer', fontWeight: 500, color: '#1e40af', textDecoration: 'underline', textDecorationStyle: 'dotted' }}
-                      >
-                        {topic.name}
-                      </span>
-                      {' '}
-                      <span style={{ fontWeight: 700, color: urgencyColor(urgency), fontSize: 12 }}>
-                        {card?.score}
-                      </span>
-                      {' '}
-                      <span style={{
-                        background: urgencyBg(urgency),
-                        color: urgencyColor(urgency),
-                        border: `1px solid ${urgencyBorder(urgency)}`,
-                        borderRadius: 9999,
-                        padding: '1px 6px',
-                        fontSize: 10,
-                        fontWeight: 600,
-                      }}>
-                        {urgency.toUpperCase()}
-                      </span>
-                    </li>
-                  )
-                })}
+                {sortedEmerging.map(topic => (
+                  <li key={topic.id} style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', lineHeight: '18px' }}>
+                    {topic.name}
+                  </li>
+                ))}
               </ul>
-              <div style={{ marginTop: 4 }}>
-                <span
-                  onClick={() => onTopicClick(sortedEmerging[0]?.id ?? '')}
-                  style={{ fontSize: 12, color: '#2563eb', cursor: 'pointer', fontWeight: 500 }}
-                >
-                  View all →
-                </span>
-              </div>
             </div>
 
             {/* RIGHT — 2×2 stat tiles */}
