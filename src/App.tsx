@@ -8,7 +8,8 @@ import { ExperienceIntelligencePage } from './pages/ExperienceIntelligencePage'
 import { AnalysisPage } from './pages/AnalysisPage'
 import { CohortPage } from './pages/CohortPage'
 import { InteractionPage } from './pages/InteractionPage'
-import { SurveyFlowPage } from './pages/SurveyFlowPage'
+// @ts-ignore — self-contained JSX emulator (phone survey) brought from nice_world
+import FeedbackIntelligenceDemo from './components/FeedbackIntelligenceDemo'
 import { CampaignMonitorPage } from './pages/CampaignMonitorPage'
 import { SurveyCampaignMonitoringPage } from './pages/SurveyCampaignMonitoringPage'
 import { SurveyDetailPage } from './pages/SurveyDetailPage'
@@ -376,7 +377,7 @@ function RecommendationsSection() {
 
 /* -------------------- App -------------------- */
 export default function App() {
-  const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype' | 'experience-intelligence'>('admin')
+  const [flow, setFlow] = useState<'admin' | 'landing' | 'feedback' | 'agent' | 'prototype' | 'experience-intelligence'>('landing')
   const [page, setPage] = useState<'campaign-portfolio' | 'dashboard' | 'analysis' | 'cohort' | 'interaction' | 'campaign-monitor' | 'survey-detail' | 'campaign-insight'>('campaign-portfolio')
   // Active section within the Feedback Intelligence shell (drives the sidebar)
   const [fiSection, setFiSection] = useState<'dashboard' | 'campaigns' | 'designs' | 'ontology'>('dashboard')
@@ -405,9 +406,9 @@ export default function App() {
     return <ExperienceIntelligencePage onBackToAdmin={() => setFlow('admin')} />
   }
 
-  // Entry point — nice_world Admin page (Employees + WEM nav)
+  // Admin page (Employees + WEM nav). Reached from the landing's FI card.
   if (flow === 'admin') {
-    return <AdminPage onAppSwitch={handleAppSwitch} />
+    return <AdminPage onAppSwitch={handleAppSwitch} onBackToLanding={() => setFlow('landing')} />
   }
 
   // Landing page (still reachable, no longer the entry)
@@ -424,6 +425,7 @@ export default function App() {
         <TopBar
           appName="Feedback Intelligence"
           onAppSwitch={handleAppSwitch}
+          onBackToLanding={() => setFlow('landing')}
         />
         <iframe
           src="/prototype.html?embed=topbar"
@@ -436,7 +438,7 @@ export default function App() {
 
   // Agent flow - Survey Flow
   if (flow === 'agent') {
-    return <SurveyFlowPage onBackToLanding={() => setFlow('landing')} />
+    return <FeedbackIntelligenceDemo onBackToLanding={() => setFlow('landing')} />
   }
 
   // Feedback Intelligence flow
@@ -499,6 +501,7 @@ export default function App() {
       title={FI_TITLES[fiSection]}
       breadcrumb={['Feedback Intelligence']}
       onAppSwitch={handleAppSwitch}
+      onBackToLanding={() => setFlow('landing')}
       navItems={FI_NAV_ITEMS}
       activeNav={fiSection}
       onNavSelect={(id) => {
