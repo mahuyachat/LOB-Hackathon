@@ -1,4 +1,4 @@
-import { ArrowLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft, ChevronRight, TrendingUp, MessageCircle } from 'lucide-react'
 import { RECOMMENDATION_CARDS, getTopicById } from '@/data/eiMockData'
 import { RecommendationCard } from './RecommendationCard'
 import { Toast } from '../shared/Toast'
@@ -89,34 +89,115 @@ export function SingleRecommendationView({
         </div>
       </div>
 
-      <div style={{ padding: '32px', maxWidth: 560 }}>
-        {card ? (
-          <RecommendationCard
-            card={{ ...card, approvedAt: approvedAt[card.id] }}
-            status={cardStatuses[card.id] ?? 'pending'}
-            onApprove={handleApprove}
-            onDismiss={onDismiss}
-          />
-        ) : (
-          <div style={{
-            background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12,
-            padding: '40px 24px', textAlign: 'center', color: '#94a3b8', fontSize: 14,
-          }}>
-            No recommendation found for this topic.
-          </div>
-        )}
+      <div style={{ padding: '28px 32px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }}>
 
-        <button
-          onClick={onBack}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            marginTop: 20, background: 'none', border: 'none',
-            cursor: 'pointer', color: '#64748b', fontSize: 13, fontWeight: 500, padding: 0,
-          }}
-        >
-          <ArrowLeft size={14} />
-          Back to Signal Intelligence
-        </button>
+        {/* ── LEFT: Recommendation card ── */}
+        <div>
+          {card ? (
+            <RecommendationCard
+              card={{ ...card, approvedAt: approvedAt[card.id] }}
+              status={cardStatuses[card.id] ?? 'pending'}
+              onApprove={handleApprove}
+              onDismiss={onDismiss}
+            />
+          ) : (
+            <div style={{
+              background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12,
+              padding: '40px 24px', textAlign: 'center', color: '#94a3b8', fontSize: 14,
+            }}>
+              No recommendation found for this topic.
+            </div>
+          )}
+
+          <button
+            onClick={onBack}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              marginTop: 20, background: 'none', border: 'none',
+              cursor: 'pointer', color: '#64748b', fontSize: 13, fontWeight: 500, padding: 0,
+            }}
+          >
+            <ArrowLeft size={14} />
+            Back to Social Intelligence Monitoring
+          </button>
+        </div>
+
+        {/* ── RIGHT: Supporting evidence ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* Stats strip */}
+          {topic && card && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+              {[
+                { label: 'Social Mentions', value: topic.socialVolume.toLocaleString(), sub: 'Last 7 days', color: '#f97316' },
+                { label: 'Urgency Score', value: card.score, sub: card.urgency.toUpperCase(), color: card.urgency === 'high' ? '#dc2626' : card.urgency === 'medium' ? '#d97706' : '#16a34a' },
+                { label: 'Weekly Trend', value: `+${topic.trendPct}%`, sub: 'vs prior week', color: '#dc2626' },
+              ].map(s => (
+                <div key={s.label} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 10, padding: '14px 16px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8', marginBottom: 4 }}>{s.label}</div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: s.color, lineHeight: 1 }}>{s.value}</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>{s.sub}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Social verbatims */}
+          {topic && topic.verbatims.social.length > 0 && (
+            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <MessageCircle size={14} color="#f97316" />
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>Social Posts Driving This Signal</span>
+                <span style={{ marginLeft: 'auto', fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>X / Twitter</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {topic.verbatims.social.map((v, i) => (
+                  <div key={i} style={{
+                    padding: '14px 18px',
+                    borderBottom: i < topic.verbatims.social.length - 1 ? '1px solid #f8fafc' : 'none',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <div style={{
+                        width: 28, height: 28, borderRadius: '50%', background: '#f1f5f9',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 11, fontWeight: 700, color: '#475569', flexShrink: 0,
+                      }}>
+                        {v.handle.replace('@', '').slice(0, 2).toUpperCase()}
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>{v.handle}</span>
+                      <span style={{ fontSize: 11, color: '#94a3b8', marginLeft: 'auto' }}>{v.date}</span>
+                    </div>
+                    <p style={{ fontSize: 13, color: '#334155', lineHeight: 1.55, margin: 0 }}>{v.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* CC verbatims (if any) */}
+          {topic && topic.verbatims.cc.length > 0 && (
+            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <TrendingUp size={14} color="#1d4ed8" />
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>Contact Center Verbatims</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {topic.verbatims.cc.map((v, i) => (
+                  <div key={i} style={{
+                    padding: '14px 18px',
+                    borderBottom: i < topic.verbatims.cc.length - 1 ? '1px solid #f8fafc' : 'none',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Agent transcript</span>
+                      <span style={{ fontSize: 11, color: '#cbd5e1', marginLeft: 'auto' }}>{v.date}</span>
+                    </div>
+                    <p style={{ fontSize: 13, color: '#334155', lineHeight: 1.55, margin: 0 }}>{v.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
