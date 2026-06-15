@@ -148,52 +148,65 @@ function RecommendationCardItem({ topicId, topicName, urgency, whyMissing, onAct
   )
 }
 
-interface SparklineProps {
-  data: number[]
+const CHANNEL_CONFIG = [
+  { key: 'twitter' as const,   label: 'X / Twitter', color: '#0f172a' },
+  { key: 'facebook' as const,  label: 'Facebook',    color: '#1877f2' },
+  { key: 'reddit' as const,    label: 'Reddit',      color: '#ff4500' },
+  { key: 'instagram' as const, label: 'Instagram',   color: '#e1306c' },
+]
+
+type ChannelKey = 'twitter' | 'facebook' | 'reddit' | 'instagram'
+
+interface MultiSparklineProps {
+  rows: { day: string; twitter: number; facebook: number; reddit: number; instagram: number }[]
   width?: number
   height?: number
-  color?: string
 }
 
-function SparklineSVG({ data, width = 400, height = 64, color = '#2563eb' }: SparklineProps) {
-  if (data.length < 2) return null
-  const min = Math.min(...data)
-  const max = Math.max(...data)
+function MultiChannelSparkline({ rows, width = 420, height = 80 }: MultiSparklineProps) {
+  if (rows.length < 2) return null
+
+  const pad = { top: 6, right: 6, bottom: 6, left: 6 }
+  const w = width - pad.left - pad.right
+  const h = height - pad.top - pad.bottom
+
+  const allValues = CHANNEL_CONFIG.flatMap(ch => rows.map(r => r[ch.key]))
+  const min = Math.min(...allValues)
+  const max = Math.max(...allValues)
   const range = max - min || 1
-  const pad = 4
-  const w = width - pad * 2
-  const h = height - pad * 2
 
-  const points = data.map((v, i) => {
-    const x = pad + (i / (data.length - 1)) * w
-    const y = pad + h - ((v - min) / range) * h
-    return `${x},${y}`
-  })
-
-  const areaPoints = [
-    `${pad},${pad + h}`,
-    ...points,
-    `${pad + w},${pad + h}`,
-  ].join(' ')
+  const toX = (i: number) => pad.left + (i / (rows.length - 1)) * w
+  const toY = (v: number) => pad.top + h - ((v - min) / range) * h
 
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ overflow: 'visible' }}>
-      <polygon
-        points={areaPoints}
-        fill={color}
-        fillOpacity={0.08}
-      />
-      <polyline
-        points={points.join(' ')}
-        fill="none"
-        stroke={color}
-        strokeWidth={2}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-      {points.map((pt, i) => {
-        const [x, y] = pt.split(',').map(Number)
-        return <circle key={i} cx={x} cy={y} r={3} fill={color} />
+      {CHANNEL_CONFIG.map(ch => {
+        const pts = rows.map((r, i) => `${toX(i)},${toY(r[ch.key])}`).join(' ')
+        return (
+          <polyline
+            key={ch.key}
+            points={pts}
+            fill="none"
+            stroke={ch.color}
+            strokeWidth={2}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            opacity={0.85}
+          />
+        )
+      })}
+      {/* dots on last day */}
+      {CHANNEL_CONFIG.map(ch => {
+        const last = rows[rows.length - 1]
+        return (
+          <circle
+            key={ch.key}
+            cx={toX(rows.length - 1)}
+            cy={toY(last[ch.key])}
+            r={3}
+            fill={ch.color}
+          />
+        )
       })}
     </svg>
   )
@@ -297,11 +310,15 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
   const bsHighCount = RECOMMENDATION_CARDS.filter(c => c.zone === 'blind-spot' && c.urgency === 'high').length
   const bsMedCount = RECOMMENDATION_CARDS.filter(c => c.zone === 'blind-spot' && c.urgency === 'medium').length
 
-  // Aggregate sparkline for top 4 blind spots (7 days)
+  // Per-channel aggregate sparkline for top 4 blind spots (7 days)
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-  const bsAggSparkline = days.map((day, i) =>
-    top4BS.reduce((sum, t) => sum + (t.sparkline[i]?.social ?? 0), 0)
-  )
+  const bsChannelRows = days.map((day, i) => ({
+    day,
+    twitter:   top4BS.reduce((s, t) => s + (t.sparkline[i]?.twitter ?? 0), 0),
+    facebook:  top4BS.reduce((s, t) => s + (t.sparkline[i]?.facebook ?? 0), 0),
+    reddit:    top4BS.reduce((s, t) => s + (t.sparkline[i]?.reddit ?? 0), 0),
+    instagram: top4BS.reduce((s, t) => s + (t.sparkline[i]?.instagram ?? 0), 0),
+  }))
 
   // ── Emerging topic data setup ──────────────────────────────
   const emOrder = ['customer-service-issue', 'late-flight', 'cancelled-flight', 'lost-luggage']
@@ -310,6 +327,14 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
     .filter(Boolean) as typeof emergingTopics
 
   const top3EM = sortedEmerging.slice(0, 3)
+
+  const emChannelRows = days.map((day, i) => ({
+    day,
+    twitter:   sortedEmerging.reduce((s, t) => s + (t.sparkline[i]?.twitter ?? 0), 0),
+    facebook:  sortedEmerging.reduce((s, t) => s + (t.sparkline[i]?.facebook ?? 0), 0),
+    reddit:    sortedEmerging.reduce((s, t) => s + (t.sparkline[i]?.reddit ?? 0), 0),
+    instagram: sortedEmerging.reduce((s, t) => s + (t.sparkline[i]?.instagram ?? 0), 0),
+  }))
 
   const emTotalCC = emergingTopics.reduce((s, t) => s + t.ccVolume, 0)
   const emTotalSocial = emergingTopics.reduce((s, t) => s + t.socialVolume, 0)
@@ -467,7 +492,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
 
           {/* Row 3: Sparkline + Donut */}
           <div style={{ display: 'flex', gap: 16, marginTop: 16 }}>
-            {/* Sparkline */}
+            {/* Multi-channel Sparkline */}
             <div style={{
               flex: '0 0 60%',
               background: '#fff',
@@ -475,16 +500,23 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
               borderRadius: 12,
               padding: '18px 20px',
             }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', marginBottom: 4 }}>
-                Social Volume Trend — Blind Spots (7-day)
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', marginBottom: 2 }}>
+                Social Volume by Channel — Blind Spots (7-day)
               </div>
               <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 12 }}>Aggregate across top 4 blind spot topics</div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 0, width: '100%' }}>
-                <SparklineSVG data={bsAggSparkline} width={420} height={72} color="#dc2626" />
-              </div>
+              <MultiChannelSparkline rows={bsChannelRows} width={420} height={80} />
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
                 {days.map(d => (
                   <span key={d} style={{ fontSize: 10, color: '#94a3b8' }}>{d}</span>
+                ))}
+              </div>
+              {/* Channel legend */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 12 }}>
+                {CHANNEL_CONFIG.map(ch => (
+                  <div key={ch.key} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <div style={{ width: 24, height: 2, background: ch.color, borderRadius: 1 }} />
+                    <span style={{ fontSize: 11, color: '#475569' }}>{ch.label}</span>
+                  </div>
                 ))}
               </div>
             </div>
@@ -640,6 +672,35 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                   />
                 )
               })}
+            </div>
+          </div>
+
+          {/* Row 3: Multi-channel sparkline */}
+          <div style={{ marginTop: 16 }}>
+            <div style={{
+              background: '#fff',
+              border: '1px solid #e2e8f0',
+              borderRadius: 12,
+              padding: '18px 20px',
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', marginBottom: 2 }}>
+                Social Volume by Channel — Emerging Topics (7-day)
+              </div>
+              <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 12 }}>Aggregate across all confirmed emerging topics</div>
+              <MultiChannelSparkline rows={emChannelRows} width={700} height={80} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, maxWidth: 700 }}>
+                {days.map(d => (
+                  <span key={d} style={{ fontSize: 10, color: '#94a3b8' }}>{d}</span>
+                ))}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 12 }}>
+                {CHANNEL_CONFIG.map(ch => (
+                  <div key={ch.key} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <div style={{ width: 24, height: 2, background: ch.color, borderRadius: 1 }} />
+                    <span style={{ fontSize: 11, color: '#475569' }}>{ch.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
