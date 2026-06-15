@@ -157,58 +157,88 @@ const CHANNEL_CONFIG = [
 
 type ChannelKey = 'twitter' | 'facebook' | 'reddit' | 'instagram'
 
-interface MultiSparklineProps {
-  rows: { day: string; twitter: number; facebook: number; reddit: number; instagram: number }[]
+// Day labels with dates — Jun 4–10 2026
+const DAY_LABELS = ['Mon Jun 4', 'Tue Jun 5', 'Wed Jun 6', 'Thu Jun 7', 'Fri Jun 8', 'Sat Jun 9', 'Sun Jun 10']
+
+interface ChannelRow {
+  day: string
+  twitter: number
+  facebook: number
+  reddit: number
+  instagram: number
+}
+
+interface SingleChannelSparklineProps {
+  rows: ChannelRow[]
+  channelKey: ChannelKey
+  color: string
+  label: string
   width?: number
   height?: number
 }
 
-function MultiChannelSparkline({ rows, width = 420, height = 80 }: MultiSparklineProps) {
-  if (rows.length < 2) return null
+function SingleChannelSparkline({ rows, channelKey, color, label, width = 200, height = 70 }: SingleChannelSparklineProps) {
+  const data = rows.map(r => r[channelKey])
+  if (data.length < 2) return null
 
-  const pad = { top: 6, right: 6, bottom: 6, left: 6 }
+  const pad = { top: 8, right: 8, bottom: 8, left: 8 }
   const w = width - pad.left - pad.right
   const h = height - pad.top - pad.bottom
-
-  const allValues = CHANNEL_CONFIG.flatMap(ch => rows.map(r => r[ch.key]))
-  const min = Math.min(...allValues)
-  const max = Math.max(...allValues)
+  const min = Math.min(...data)
+  const max = Math.max(...data)
   const range = max - min || 1
 
-  const toX = (i: number) => pad.left + (i / (rows.length - 1)) * w
+  const toX = (i: number) => pad.left + (i / (data.length - 1)) * w
   const toY = (v: number) => pad.top + h - ((v - min) / range) * h
 
+  const pts = data.map((v, i) => `${toX(i)},${toY(v)}`).join(' ')
+  const areaPoints = [
+    `${pad.left},${pad.top + h}`,
+    ...data.map((v, i) => `${toX(i)},${toY(v)}`),
+    `${pad.left + w},${pad.top + h}`,
+  ].join(' ')
+
+  const latest = data[data.length - 1]
+  const prev = data[data.length - 2]
+  const delta = latest - prev
+  const pct = prev > 0 ? Math.round((delta / prev) * 100) : 0
+
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ overflow: 'visible' }}>
-      {CHANNEL_CONFIG.map(ch => {
-        const pts = rows.map((r, i) => `${toX(i)},${toY(r[ch.key])}`).join(' ')
-        return (
-          <polyline
-            key={ch.key}
-            points={pts}
-            fill="none"
-            stroke={ch.color}
-            strokeWidth={2}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            opacity={0.85}
-          />
-        )
-      })}
-      {/* dots on last day */}
-      {CHANNEL_CONFIG.map(ch => {
-        const last = rows[rows.length - 1]
-        return (
-          <circle
-            key={ch.key}
-            cx={toX(rows.length - 1)}
-            cy={toY(last[ch.key])}
-            r={3}
-            fill={ch.color}
-          />
-        )
-      })}
-    </svg>
+    <div style={{
+      background: '#fff',
+      border: '1px solid #e2e8f0',
+      borderRadius: 10,
+      padding: '14px 16px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 6,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>{label}</span>
+        </div>
+        <span style={{
+          fontSize: 11, fontWeight: 600,
+          color: delta >= 0 ? '#dc2626' : '#16a34a',
+        }}>
+          {delta >= 0 ? '+' : ''}{pct}%
+        </span>
+      </div>
+      <div style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>
+        {latest.toLocaleString()}
+        <span style={{ fontSize: 11, fontWeight: 400, color: '#94a3b8', marginLeft: 4 }}>mentions</span>
+      </div>
+      <svg width={width - 32} height={height} viewBox={`0 0 ${width - 32} ${height}`} style={{ overflow: 'visible', display: 'block' }}>
+        <polygon points={areaPoints} fill={color} fillOpacity={0.08} />
+        <polyline points={pts} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+        <circle cx={toX(data.length - 1)} cy={toY(latest)} r={3} fill={color} />
+      </svg>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 9, color: '#cbd5e1' }}>{DAY_LABELS[0]}</span>
+        <span style={{ fontSize: 9, color: '#cbd5e1' }}>{DAY_LABELS[DAY_LABELS.length - 1]}</span>
+      </div>
+    </div>
   )
 }
 
@@ -311,8 +341,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
   const bsMedCount = RECOMMENDATION_CARDS.filter(c => c.zone === 'blind-spot' && c.urgency === 'medium').length
 
   // Per-channel aggregate sparkline for top 4 blind spots (7 days)
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-  const bsChannelRows = days.map((day, i) => ({
+  const bsChannelRows = DAY_LABELS.map((day, i) => ({
     day,
     twitter:   top4BS.reduce((s, t) => s + (t.sparkline[i]?.twitter ?? 0), 0),
     facebook:  top4BS.reduce((s, t) => s + (t.sparkline[i]?.facebook ?? 0), 0),
@@ -328,7 +357,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
 
   const top3EM = sortedEmerging.slice(0, 3)
 
-  const emChannelRows = days.map((day, i) => ({
+  const emChannelRows = DAY_LABELS.map((day, i) => ({
     day,
     twitter:   sortedEmerging.reduce((s, t) => s + (t.sparkline[i]?.twitter ?? 0), 0),
     facebook:  sortedEmerging.reduce((s, t) => s + (t.sparkline[i]?.facebook ?? 0), 0),
@@ -457,57 +486,21 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
             </div>
           </div>
 
-          {/* Row 3: Sparkline + Donut */}
-          <div style={{ display: 'flex', gap: 16, marginTop: 16 }}>
-            {/* Multi-channel Sparkline */}
-            <div style={{
-              flex: '0 0 60%',
-              background: '#fff',
-              border: '1px solid #e2e8f0',
-              borderRadius: 12,
-              padding: '18px 20px',
-            }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', marginBottom: 2 }}>
-                Social Volume by Channel — Blind Spots (7-day)
-              </div>
-              <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 12 }}>Aggregate across top 4 blind spot topics</div>
-              <MultiChannelSparkline rows={bsChannelRows} width={420} height={80} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                {days.map(d => (
-                  <span key={d} style={{ fontSize: 10, color: '#94a3b8' }}>{d}</span>
-                ))}
-              </div>
-              {/* Channel legend */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 12 }}>
-                {CHANNEL_CONFIG.map(ch => (
-                  <div key={ch.key} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <div style={{ width: 24, height: 2, background: ch.color, borderRadius: 1 }} />
-                    <span style={{ fontSize: 11, color: '#475569' }}>{ch.label}</span>
-                  </div>
-                ))}
-              </div>
+          {/* Row 3: Per-channel trend cards (2×2 grid) */}
+          <div style={{ marginTop: 16 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>
+              Social Volume Trends by Channel — Blind Spots
             </div>
-
-            {/* Donut */}
-            <div style={{
-              flex: '0 0 calc(40% - 16px)',
-              background: '#fff',
-              border: '1px solid #e2e8f0',
-              borderRadius: 12,
-              padding: '18px 20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 12,
-            }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>Topics Health</div>
-              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: -6 }}>By urgency level</div>
-              <DonutChart
-                size={120}
-                segments={[
-                  { label: 'High urgency', value: bsHighCount, color: '#dc2626' },
-                  { label: 'Medium urgency', value: bsMedCount, color: '#d97706' },
-                ]}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
+              {CHANNEL_CONFIG.map(ch => (
+                <SingleChannelSparkline
+                  key={ch.key}
+                  rows={bsChannelRows}
+                  channelKey={ch.key}
+                  color={ch.color}
+                  label={ch.label}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -609,32 +602,21 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
             </div>
           </div>
 
-          {/* Row 3: Multi-channel sparkline */}
+          {/* Row 3: Per-channel trend cards */}
           <div style={{ marginTop: 16 }}>
-            <div style={{
-              background: '#fff',
-              border: '1px solid #e2e8f0',
-              borderRadius: 12,
-              padding: '18px 20px',
-            }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', marginBottom: 2 }}>
-                Social Volume by Channel — Emerging Topics (7-day)
-              </div>
-              <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 12 }}>Aggregate across all confirmed emerging topics</div>
-              <MultiChannelSparkline rows={emChannelRows} width={700} height={80} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, maxWidth: 700 }}>
-                {days.map(d => (
-                  <span key={d} style={{ fontSize: 10, color: '#94a3b8' }}>{d}</span>
-                ))}
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 12 }}>
-                {CHANNEL_CONFIG.map(ch => (
-                  <div key={ch.key} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <div style={{ width: 24, height: 2, background: ch.color, borderRadius: 1 }} />
-                    <span style={{ fontSize: 11, color: '#475569' }}>{ch.label}</span>
-                  </div>
-                ))}
-              </div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>
+              Social Volume Trends by Channel — Emerging Topics
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
+              {CHANNEL_CONFIG.map(ch => (
+                <SingleChannelSparkline
+                  key={ch.key}
+                  rows={emChannelRows}
+                  channelKey={ch.key}
+                  color={ch.color}
+                  label={ch.label}
+                />
+              ))}
             </div>
           </div>
         </div>
