@@ -439,10 +439,9 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
               <StatTile
                 label="Social Mentions"
                 value={bsTotalSocial.toLocaleString()}
-                chip="↗ mentions risk"
+                chip="↗ vs last week"
                 chipColor="#dc2626"
                 chipBg="#fee2e2"
-                onClick={() => onTopicClick(bsHighestScoreTopic.id)}
               />
               <StatTile
                 label="Avg Sentiment"
