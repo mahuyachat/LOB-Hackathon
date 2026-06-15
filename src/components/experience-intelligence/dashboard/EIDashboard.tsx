@@ -429,7 +429,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
               </ul>
             </div>
 
-            {/* RIGHT — 2×2 stat tiles */}
+            {/* RIGHT — stat tiles */}
             <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <StatTile
                 label="Social Mentions"
@@ -445,20 +445,6 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                 chip={sentimentLabel(bsAvgSentiment)}
                 chipColor="#92400e"
                 chipBg="#fef3c7"
-              />
-              <StatTile
-                label="Top Urgency Score"
-                value={bsTopScore}
-                chip="High urgency"
-                chipColor="#dc2626"
-                chipBg="#fee2e2"
-              />
-              <StatTile
-                label="Pending Actions"
-                value={pendingBlindSpots}
-                chip={`${pendingBlindSpots} pending`}
-                chipColor="#1e40af"
-                chipBg="#eff6ff"
               />
             </div>
           </div>
