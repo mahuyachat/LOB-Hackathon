@@ -48,7 +48,7 @@ export function RecommendationCard({ card, status, onApprove, onDismiss }: Props
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-                <ZoneBadge zone="blind-spot" size="xs" />
+                <ZoneBadge zone={card.zone} size="xs" />
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 4,
                   fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
