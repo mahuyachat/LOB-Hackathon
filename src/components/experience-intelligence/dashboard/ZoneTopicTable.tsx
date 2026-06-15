@@ -235,10 +235,10 @@ export function ZoneTopicTable({ zone, onTopicClick, onOpenRecommendation }: Pro
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 20, padding: '14px 2px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12, color: '#64748b' }}>
           <span style={{ fontWeight: 500, color: '#94a3b8' }}>Zone:</span>
-          {(['emerging', 'blind-spot', 'private-signal'] as Zone[]).map(z => (
+          {(['emerging', 'blind-spot'] as Zone[]).map(z => (
             <span key={z} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <ZoneIcon zone={z} size={12} />
-              {z === 'emerging' ? 'Emerging' : z === 'blind-spot' ? 'Blind Spot' : 'Under-the-Radar'}
+              {z === 'emerging' ? 'Emerging' : 'Blind Spot'}
             </span>
           ))}
         </div>

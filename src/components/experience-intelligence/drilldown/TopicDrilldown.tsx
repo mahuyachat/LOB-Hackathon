@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowLeft, TrendingUp, TrendingDown } from 'lucide-react'
-import { getTopicById, getCardByTopicId } from '@/data/eiMockData'
+import { getTopicById, getCardByTopicId, ROOT_CAUSE_CONFIG } from '@/data/eiMockData'
 import { ZoneBadge } from '../shared/ZoneBadge'
 import { SentimentPill } from '../shared/SentimentPill'
 import { RecommendationCard } from '../recommendations/RecommendationCard'
@@ -273,7 +273,28 @@ export function TopicDrilldown({ topicId, cardStatuses, approvedAt, onBack, onAp
 
         {/* Verbatims */}
         <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 24px' }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>Sample Verbatims</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>Sample Verbatims</div>
+            {topic.socialVolume > 0 && (
+              <a
+                href="#"
+                onClick={e => e.preventDefault()}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  fontSize: 13, fontWeight: 600, color: '#f97316',
+                  textDecoration: 'none', borderBottom: '1px solid #fed7aa',
+                  paddingBottom: 1,
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#ea580c')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#f97316')}
+              >
+                View all {topic.socialVolume.toLocaleString()} mentions
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </a>
+            )}
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {/* Contact Center */}
             <div>
@@ -318,6 +339,32 @@ export function TopicDrilldown({ topicId, cardStatuses, approvedAt, onBack, onAp
             </div>
           </div>
         </div>
+
+        {/* Why this is a blind spot callout */}
+        {topic.zone === 'blind-spot' && linkedCard && (() => {
+          const rc = ROOT_CAUSE_CONFIG[linkedCard.rootCausePattern]
+          return (
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 24px' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#64748b', marginBottom: 12 }}>
+                Why this topic never reaches the contact center
+              </div>
+              <div style={{
+                display: 'flex', alignItems: 'flex-start', gap: 12,
+                background: rc.bg, border: `1px solid ${rc.border}`,
+                borderLeft: `3px solid ${rc.border}`, borderRadius: 8,
+                padding: '12px 14px',
+              }}>
+                <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0 }}>{rc.icon}</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: rc.text, marginBottom: 4 }}>{rc.label}</div>
+                  <p style={{ fontSize: 13, color: rc.text, opacity: 0.85, margin: 0, lineHeight: 1.55 }}>
+                    {linkedCard.rootCauseExplanation}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Linked recommendation card */}
         {linkedCard && (

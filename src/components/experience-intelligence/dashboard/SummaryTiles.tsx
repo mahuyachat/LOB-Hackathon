@@ -1,4 +1,4 @@
-import { BRAND_CONFIG, emergingTopics, blindSpotTopics, privateSignalTopics, type Zone } from '@/data/eiMockData'
+import { BRAND_CONFIG, emergingTopics, blindSpotTopics, type Zone } from '@/data/eiMockData'
 
 interface Props {
   pendingBlindSpots: number
@@ -32,14 +32,6 @@ export function SummaryTiles({ pendingBlindSpots, selectedZone, onSelectZone }: 
       bg: '#fef2f2', border: '#fecaca', text: '#b91c1c', badge: '#ef4444',
     },
     {
-      zone: 'private-signal',
-      label: 'Under-the-Radar',
-      value: privateSignalTopics.length,
-      total: null,
-      desc: 'Topics brewing inside the contact center before going public',
-      bg: '#f8fafc', border: '#e2e8f0', text: '#334155', badge: '#64748b',
-    },
-    {
       zone: 'emerging',
       label: 'Emerging Topics',
       value: emergingTopics.length,
@@ -58,7 +50,7 @@ export function SummaryTiles({ pendingBlindSpots, selectedZone, onSelectZone }: 
   ]
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
       {tiles.map(tile => {
         const clickable = tile.zone !== null
         const selected = clickable && tile.zone === selectedZone
@@ -116,6 +108,7 @@ export function SummaryTiles({ pendingBlindSpots, selectedZone, onSelectZone }: 
             {tile.value !== null && (
               <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.4 }}>{tile.desc}</div>
             )}
+
           </div>
         )
       })}
