@@ -46,9 +46,9 @@ interface StatTileProps {
   sparklineColor?: string
 }
 
-function MiniSparkline({ data, color }: { data: number[]; color: string }) {
+function MiniSparkline({ data, color, width = 80, height = 28, fullWidth = false }: { data: number[]; color: string; width?: number; height?: number; fullWidth?: boolean }) {
   if (data.length < 2) return null
-  const w = 80, h = 28, pad = 2
+  const w = width, h = height, pad = 2
   const min = Math.min(...data)
   const max = Math.max(...data)
   const range = max - min || 1
@@ -61,11 +61,14 @@ function MiniSparkline({ data, color }: { data: number[]; color: string }) {
     `${w - pad},${h - pad}`,
   ].join(' ')
   const latest = data[data.length - 1]
-  const prev = data[data.length - 2]
-  const delta = latest - prev
-  const pct = prev > 0 ? Math.round((delta / prev) * 100) : 0
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ overflow: 'visible', display: 'block' }}>
+    <svg
+      width={fullWidth ? '100%' : w}
+      height={h}
+      viewBox={`0 0 ${w} ${h}`}
+      preserveAspectRatio="none"
+      style={{ overflow: 'visible', display: 'block' }}
+    >
       <polygon points={areaPoints} fill={color} fillOpacity={0.12} />
       <polyline points={pts} fill="none" stroke={color} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
       <circle cx={toX(data.length - 1)} cy={toY(latest)} r={2.5} fill={color} />
@@ -125,7 +128,7 @@ function StatTile({ label, value, chip, chipColor, chipBg, onClick, sparklineDat
         )}
       </div>
       {sparklineData && sparklineData.length >= 2 && (
-        <MiniSparkline data={sparklineData} color={sparklineColor ?? '#64748b'} />
+        <MiniSparkline data={sparklineData} color={sparklineColor ?? '#64748b'} width={200} height={48} fullWidth />
       )}
     </div>
   )
@@ -163,7 +166,7 @@ function SocialMentionsTile({ value, sparklineData, sparklineColor }: SocialMent
           {trendUp ? '+' : ''}{pct}%
         </span>
       </div>
-      <MiniSparkline data={sparklineData} color={sparklineColor} />
+      <MiniSparkline data={sparklineData} color={sparklineColor} width={200} height={48} fullWidth />
     </div>
   )
 }
