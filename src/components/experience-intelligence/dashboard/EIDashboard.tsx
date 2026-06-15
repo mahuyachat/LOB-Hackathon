@@ -542,8 +542,8 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
               </ul>
             </div>
 
-            {/* RIGHT — 2×2 stat tiles */}
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {/* RIGHT — stat tiles (single row) */}
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
               <StatTile
                 label="CC Mentions"
                 value={emTotalCC.toLocaleString()}
@@ -564,13 +564,6 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                 chip={sentimentLabel(emAvgSentiment)}
                 chipColor="#92400e"
                 chipBg="#fef3c7"
-              />
-              <StatTile
-                label="Top Urgency Score"
-                value={emTopScore}
-                chip="High urgency"
-                chipColor="#dc2626"
-                chipBg="#fee2e2"
               />
             </div>
           </div>
