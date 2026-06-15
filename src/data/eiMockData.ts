@@ -49,19 +49,18 @@ export interface Topic {
 export interface RecommendationCard {
   id: string
   topicId: string
-  zone: 'blind-spot'
+  zone: 'blind-spot' | 'emerging'
   headline: string
-  // Structured AI analysis — replaces the single heavy aiNarrative
-  whyMissing: string      // Why this topic doesn't surface in contact center data
+  whyMissing?: string     // Blind-spot only: why topic doesn't surface in CC
   rootCause: string       // The underlying CX/process/system reason
-  recommendedAction: string  // Concise action sentence
-  department: string      // Owning team(s), e.g. "Digital + Operations"
-  score: number              // VU score 0–100 — primary sort key
+  recommendedAction: string
+  department: string
+  score: number           // VU score 0–100 — primary sort key
   urgency: 'high' | 'medium' | 'low'
-  rootCausePattern: RootCausePattern
-  rootCauseLabel: string
-  rootCauseExplanation: string
-  actionType: 'qm-coaching' | 'digital-incident' | 'notify-ops' | 'escalate-training' | 'proactive-recovery' | 'update-script' | 'retention-workflow' | 'escalate-policy' | 'empathy-coaching'
+  rootCausePattern?: RootCausePattern  // Blind-spot only
+  rootCauseLabel?: string              // Blind-spot only
+  rootCauseExplanation?: string        // Blind-spot only
+  actionType: 'qm-coaching' | 'digital-incident' | 'notify-ops' | 'escalate-training' | 'proactive-recovery' | 'update-script' | 'retention-workflow' | 'escalate-policy' | 'empathy-coaching' | 'raise-ticket'
   actionLabel: string
   actionDetail: string
   status: 'pending' | 'approved' | 'dismissed'
@@ -343,11 +342,11 @@ export const TOPICS: Topic[] = [
     verbatims: {
       cc: [],
       social: [
-        { text: "@Delta just charged me $45 for a bag that was 3lbs over. This nickel-and-diming is why people switch to Southwest.", date: 'Jun 10', handle: '@baggage_furious' },
-        { text: "Why does @Delta charge for a first bag when every other airline includes it? Just raise the ticket price and stop the games.", date: 'Jun 9', handle: '@fee_transparency' },
-        { text: "@Delta agent told me my bag was free with my card benefit, then charged me anyway at the gate. Now no one will refund it.", date: 'Jun 9', handle: '@gate_charge' },
-        { text: "Bag fee went from $30 to $40 with zero notice. Found out at check-in. Thanks for nothing @Delta.", date: 'Jun 8', handle: '@surprise_fees' },
-        { text: "@Delta I fly 60 segments a year and you still charged me a bag fee due to a status glitch. Three calls and still unresolved.", date: 'Jun 8', handle: '@medallion_mad' },
+        { text: "Nobody told me the extra bag fee I paid was ONE WAY ONLY. Showed up at the gate for my return flight and had to pay again. @Delta this is predatory pricing.", date: 'Jun 10', handle: '@return_shock' },
+        { text: "Genuinely thought I'd already paid for my luggage. Turns out the $65 I paid going out doesn't cover the way back. @Delta why is this not made clear at booking??", date: 'Jun 10', handle: '@confused_flyer' },
+        { text: "@Delta I paid extra bag fee at outbound check-in. Gate agent on my return flight had zero record of it. Charged again. Two receipts, one bag, two charges.", date: 'Jun 9', handle: '@double_charge' },
+        { text: "Just found out at the gate that bag fees are per direction. It's in the fine print apparently. @Delta needs to make this obvious at checkout, not at the boarding gate.", date: 'Jun 9', handle: '@gate_surprise' },
+        { text: "Charged $45 for extra bag on the way there. Thought I was sorted. Return flight — another $45. @Delta this should be shown as a round-trip cost upfront.", date: 'Jun 8', handle: '@rt_baggage' },
       ],
     },
   },
@@ -654,18 +653,18 @@ export const RECOMMENDATION_CARDS: RecommendationCard[] = [
     topicId: 'bs-4',
     zone: 'blind-spot',
     headline: 'Baggage fee complaints are surging on social — customers see a call as futile against a company policy',
-    whyMissing: "Baggage fee policy complaints rank #4 on social this week with 1,320 mentions — up 35% — and are absent from contact center data. Customers correctly assess that an agent cannot change the airline's fee structure, so they don't call.",
+    whyMissing: "Baggage fee policy complaints rank #2 on social this week with 1,320 mentions — up 35% — and are absent from contact center data. Customers correctly assess that an agent cannot change the airline's fee structure, so they don't call.",
     rootCause: "Customers don't call because they know an agent can't change pricing policy — social is their protest channel. Left unaddressed, this fuels competitor comparison posts and compounds churn risk.",
-    recommendedAction: "Escalate to the Pricing & Revenue policy owner with the social volume data as evidence. Prepare agents with approved empathy talking points and any available fee exceptions or waivers.",
-    department: "Pricing & Revenue + QM",
+    recommendedAction: "Notify Business Leadership with the social volume trend as evidence of recurring customer dissatisfaction. This is a policy-level issue — the recurring signal needs to reach decision-makers who can review the fee structure or introduce customer-friendly exceptions.",
+    department: "Business Leadership + Revenue",
     score: 81,
     urgency: 'high',
     rootCausePattern: 'policy-disagreement',
     rootCauseLabel: 'Policy Disagreement',
     rootCauseExplanation: 'Customers don\'t call because they know an agent can\'t change pricing policy — social is their protest channel.',
     actionType: 'escalate-policy',
-    actionLabel: 'Escalate to Policy Owner',
-    actionDetail: 'Social volume data will be compiled and routed to the Pricing & Revenue team as customer evidence. Agent talking points for baggage fee conversations will be reviewed and updated.',
+    actionLabel: 'Notify Business Leadership',
+    actionDetail: 'A briefing will be prepared for Business Leadership summarising the social volume trend, verbatim samples, and week-over-week growth. The goal is to surface this as a recurring policy pain point that warrants a business-level review.',
     status: 'pending',
     trendLabel: '+35% this week',
   },
@@ -708,6 +707,72 @@ export const RECOMMENDATION_CARDS: RecommendationCard[] = [
     actionDetail: 'Accessibility and special assistance coaching module will be reviewed and updated. QM evaluation rubric will be updated to include accessibility handling as a scored dimension. Digital self-service path for special assistance will be flagged for UX review.',
     status: 'pending',
     trendLabel: '+29% this week',
+  },
+
+  // ─── EMERGING TOPIC RECOMMENDATIONS ─────────────────────────────────────────
+  {
+    id: 'ec-1',
+    topicId: 'customer-service-issue',
+    zone: 'emerging',
+    headline: 'Customer service quality is the #1 issue across both CC and social — inconsistent agent responses are amplifying frustration',
+    rootCause: "Customers are receiving inconsistent answers across interactions — agents are not aligned on resolution paths. This drives repeat contacts, escalations, and social venting even after a CC interaction.",
+    recommendedAction: "Launch a targeted QM coaching programme focused on first-contact resolution and consistency of response. Review recent low-scoring interactions to identify the specific gaps driving repeat contacts and social escalation.",
+    department: "Quality Management",
+    score: 84,
+    urgency: 'high',
+    actionType: 'qm-coaching',
+    actionLabel: 'Launch QM Coaching',
+    actionDetail: 'QM team will run a targeted coaching sprint focused on consistency, first-contact resolution, and de-escalation. Low-scoring interactions from the last 7 days will be reviewed to identify specific agent knowledge gaps.',
+    status: 'pending',
+    trendLabel: '+18% this week',
+  },
+  {
+    id: 'ec-2',
+    topicId: 'late-flight',
+    zone: 'emerging',
+    headline: 'Flight delay complaints are rising in both CC and social — passengers are frustrated by lack of proactive communication',
+    rootCause: "Delays themselves are an operational reality, but the complaint volume spike is driven by lack of proactive communication. Passengers find out at the gate rather than in advance, leaving them no time to rearrange plans.",
+    recommendedAction: "Engage Operations to review the delay notification workflow. Proactive SMS/app push notifications with realistic ETAs should be triggered earlier in the delay cycle, before passengers reach the gate.",
+    department: "Operations + Digital",
+    score: 74,
+    urgency: 'high',
+    actionType: 'notify-ops',
+    actionLabel: 'Review Delay Notification Flow',
+    actionDetail: 'Operations team will audit the current delay notification trigger points. Digital will implement earlier push/SMS alerts with estimated rebooking options for passengers on affected routes.',
+    status: 'pending',
+    trendLabel: '+24% this week',
+  },
+  {
+    id: 'ec-3',
+    topicId: 'cancelled-flight',
+    zone: 'emerging',
+    headline: 'Cancelled flight complaints carry the highest sentiment negativity — passengers feel abandoned after cancellation',
+    rootCause: "Cancellations are generating high-severity frustration not just from the disruption itself, but from the recovery experience — slow rebooking, no hotel support, and app failures at the moment of highest need.",
+    recommendedAction: "Activate an immediate post-cancellation recovery workflow: auto-rebook where possible, surface hotel and meal voucher options proactively, and ensure the app rebooking path is resilient under high load.",
+    department: "Operations + Digital",
+    score: 65,
+    urgency: 'medium',
+    actionType: 'proactive-recovery',
+    actionLabel: 'Activate Recovery Workflow',
+    actionDetail: 'A post-cancellation recovery playbook will be activated: auto-rebook eligible passengers, surface compensation options in the app within 30 minutes of cancellation, and stress-test the rebooking flow under peak load.',
+    status: 'pending',
+    trendLabel: 'Stable this week',
+  },
+  {
+    id: 'ec-4',
+    topicId: 'lost-luggage',
+    zone: 'emerging',
+    headline: 'Lost luggage complaints are accelerating — passengers have no reliable way to track their bags in real time',
+    rootCause: "The core frustration is not just lost bags — it is the inability to get a real-time status. The tracking link is broken for many passengers, and baggage office staffing is inconsistent, leaving customers with no recovery path.",
+    recommendedAction: "Fix the baggage tracking link immediately and audit baggage office staffing at the highest-complaint airports. Consider proactive outreach to passengers with delayed bags before they need to call in.",
+    department: "Operations + Baggage",
+    score: 62,
+    urgency: 'medium',
+    actionType: 'notify-ops',
+    actionLabel: 'Fix Tracking & Notify Ops',
+    actionDetail: 'Digital will fix the broken tracking link as a P1. Operations will audit baggage office staffing at ATL and LAX. A proactive outreach workflow will be scoped for passengers whose bags have been delayed over 24 hours.',
+    status: 'pending',
+    trendLabel: '+31% this week',
   },
 ]
 

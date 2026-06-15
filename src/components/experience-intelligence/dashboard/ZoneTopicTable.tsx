@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TrendingUp, TrendingDown, Minus, Headphones, ChevronRight, AlertTriangle, Shield } from 'lucide-react'
+import { TrendingUp, TrendingDown, Minus, Headphones, ChevronRight, Shield } from 'lucide-react'
 import {
   blindSpotTopics, privateSignalTopics, emergingTopics,
   getCardByTopicId, type Topic, type Zone, type RecommendationCard,
@@ -35,8 +35,9 @@ const URGENCY_STYLE: Record<RecommendationCard['urgency'], { bg: string; text: s
 }
 
 function rowsForZone(zone: Zone, cards: Map<string, RecommendationCard>): Topic[] {
-  if (zone === 'blind-spot') {
-    return [...blindSpotTopics].sort((a, b) => {
+  if (zone === 'blind-spot' || zone === 'emerging') {
+    const source = zone === 'blind-spot' ? blindSpotTopics : emergingTopics
+    return [...source].sort((a, b) => {
       const scoreA = cards.get(a.id)?.score ?? 0
       const scoreB = cards.get(b.id)?.score ?? 0
       return scoreB - scoreA
@@ -110,8 +111,9 @@ function UrgencyBadge({ urgency }: { urgency: RecommendationCard['urgency'] }) {
 }
 
 export function ZoneTopicTable({ zone, onTopicClick, onOpenRecommendation }: Props) {
+  const topicsForCards = zone === 'blind-spot' ? blindSpotTopics : zone === 'emerging' ? emergingTopics : []
   const cardMap = new Map(
-    (zone === 'blind-spot' ? blindSpotTopics : []).map(t => {
+    topicsForCards.map(t => {
       const c = getCardByTopicId(t.id)
       return [t.id, c] as [string, RecommendationCard]
     }).filter(([, c]) => c != null)
@@ -153,14 +155,14 @@ export function ZoneTopicTable({ zone, onTopicClick, onOpenRecommendation }: Pro
               {zone === 'emerging' && <th style={th}>{ccHeader}</th>}
               {zone === 'emerging' && <th style={th}>{socialHeader}</th>}
               <th style={th}>Trend</th>
-              {zone === 'blind-spot' && <th style={th}>Urgency Score</th>}
-              {zone === 'blind-spot' && <th style={{ ...th, textAlign: 'right' }}>Action</th>}
-              {zone !== 'blind-spot' && <th style={{ ...th, width: 40 }} />}
+              {(zone === 'blind-spot' || zone === 'emerging') && <th style={th}>Urgency Score</th>}
+              {(zone === 'blind-spot' || zone === 'emerging') && <th style={{ ...th, textAlign: 'right' }}>Action</th>}
+              {zone === 'private-signal' && <th style={{ ...th, width: 40 }} />}
             </tr>
           </thead>
           <tbody>
             {rows.map((topic, i) => {
-              const card = zone === 'blind-spot' ? cardMap.get(topic.id) : undefined
+              const card = (zone === 'blind-spot' || zone === 'emerging') ? cardMap.get(topic.id) : undefined
               return (
                 <tr
                   key={topic.id}
@@ -211,8 +213,8 @@ export function ZoneTopicTable({ zone, onTopicClick, onOpenRecommendation }: Pro
                     <TrendChip trend={topic.trend} pct={topic.trendPct} />
                   </td>
 
-                  {/* Blind spot: score + urgency */}
-                  {zone === 'blind-spot' && (
+                  {/* Score + urgency */}
+                  {(zone === 'blind-spot' || zone === 'emerging') && (
                     <td style={{ padding: '14px 16px' }}>
                       {card ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
@@ -224,7 +226,7 @@ export function ZoneTopicTable({ zone, onTopicClick, onOpenRecommendation }: Pro
                       ) : <span style={{ color: '#cbd5e1' }}>—</span>}
                     </td>
                   )}
-                  {zone === 'blind-spot' && (
+                  {(zone === 'blind-spot' || zone === 'emerging') && (
                     <td style={{ padding: '14px 16px', textAlign: 'right' }}>
                       <button
                         onClick={e => { e.stopPropagation(); onOpenRecommendation(topic.id) }}
@@ -239,8 +241,8 @@ export function ZoneTopicTable({ zone, onTopicClick, onOpenRecommendation }: Pro
                     </td>
                   )}
 
-                  {/* Non-blind-spot: drill-in chevron */}
-                  {zone !== 'blind-spot' && (
+                  {/* Private signal: drill-in chevron only */}
+                  {zone === 'private-signal' && (
                     <td style={{ padding: '14px 16px', textAlign: 'right', color: '#cbd5e1', fontSize: 16 }}>›</td>
                   )}
                 </tr>

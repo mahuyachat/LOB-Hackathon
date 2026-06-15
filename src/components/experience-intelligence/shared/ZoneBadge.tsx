@@ -1,8 +1,8 @@
-import { TrendingUp, AlertTriangle, Shield } from 'lucide-react'
+import { TrendingUp, EyeOff, Shield } from 'lucide-react'
 import type { Zone } from '@/data/eiMockData'
 export { ROOT_CAUSE_CONFIG } from '@/data/eiMockData'
 
-type ZoneConfig = { label: string; bg: string; text: string; border: string; Icon: typeof TrendingUp }
+type ZoneConfig = { label: string; bg: string; text: string; border: string; Icon: typeof EyeOff }
 
 const CONFIG: Record<Zone, ZoneConfig> = {
   'emerging': {
@@ -17,7 +17,7 @@ const CONFIG: Record<Zone, ZoneConfig> = {
     bg: '#fef2f2',
     text: '#b91c1c',
     border: '#fecaca',
-    Icon: AlertTriangle,
+    Icon: EyeOff,
   },
   'private-signal': {
     label: 'Under-the-Radar',
