@@ -1,4 +1,4 @@
-import { ArrowLeft, ChevronRight, TrendingUp, MessageCircle } from 'lucide-react'
+import { ArrowLeft, TrendingUp, ExternalLink, ChevronRight } from 'lucide-react'
 import { RECOMMENDATION_CARDS, getTopicById } from '@/data/eiMockData'
 import { RecommendationCard } from './RecommendationCard'
 import { Toast } from '../shared/Toast'
@@ -61,31 +61,13 @@ export function SingleRecommendationView({
           <span style={{ color: '#0f172a', fontWeight: 500 }}>{topic?.name ?? 'Recommendation'}</span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#f97316', marginBottom: 4 }}>
-              ✦ AI Recommendation
-            </div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', margin: 0 }}>
-              {topic?.name ?? 'Blind Spot Recommendation'}
-            </h1>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#f97316', marginBottom: 4 }}>
+            ✦ AI Recommendation
           </div>
-          <button
-            onClick={onViewAll}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              background: '#fff', border: '1px solid #e2e8f0',
-              borderRadius: 8, padding: '8px 14px',
-              fontSize: 13, fontWeight: 600, color: '#334155',
-              cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-              transition: 'border-color 0.15s',
-            }}
-            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.borderColor = '#94a3b8')}
-            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0')}
-          >
-            View all recommendations
-            <ChevronRight size={14} />
-          </button>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', margin: 0 }}>
+            {topic?.name ?? 'Blind Spot Recommendation'}
+          </h1>
         </div>
       </div>
 
@@ -143,36 +125,55 @@ export function SingleRecommendationView({
           )}
 
           {/* Social verbatims */}
-          {topic && topic.verbatims.social.length > 0 && (
-            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
-              <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <MessageCircle size={14} color="#f97316" />
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>Social Posts Driving This Signal</span>
-                <span style={{ marginLeft: 'auto', fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>X / Twitter</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {topic.verbatims.social.map((v, i) => (
-                  <div key={i} style={{
-                    padding: '14px 18px',
-                    borderBottom: i < topic.verbatims.social.length - 1 ? '1px solid #f8fafc' : 'none',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                      <div style={{
-                        width: 28, height: 28, borderRadius: '50%', background: '#f1f5f9',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 11, fontWeight: 700, color: '#475569', flexShrink: 0,
+          {topic && topic.verbatims.social.length > 0 && (() => {
+            const PLATFORM_CONFIG = {
+              twitter:   { label: 'X / Twitter', color: '#0f172a', bg: '#f1f5f9' },
+              facebook:  { label: 'Facebook',    color: '#1877f2', bg: '#eff6ff' },
+              reddit:    { label: 'Reddit',       color: '#ff4500', bg: '#fff7ed' },
+              instagram: { label: 'Instagram',    color: '#e1306c', bg: '#fdf2f8' },
+            }
+            return (
+              <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
+                <div style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>Recent Social Media Posts</span>
+                  <span style={{ fontSize: 11, color: '#94a3b8', marginLeft: 4 }}>driving this signal</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {topic.verbatims.social.map((v, i) => {
+                    const pc = PLATFORM_CONFIG[v.platform]
+                    return (
+                      <div key={i} style={{
+                        padding: '12px 18px',
+                        borderBottom: i < topic.verbatims.social.length - 1 ? '1px solid #f8fafc' : 'none',
                       }}>
-                        {v.handle.replace('@', '').slice(0, 2).toUpperCase()}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                          <span style={{
+                            fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em',
+                            background: pc.bg, color: pc.color, borderRadius: 4, padding: '2px 6px',
+                            flexShrink: 0,
+                          }}>
+                            {pc.label}
+                          </span>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: '#334155', flexShrink: 0 }}>{v.handle}</span>
+                          <span style={{ fontSize: 11, color: '#94a3b8', marginLeft: 'auto', flexShrink: 0 }}>{v.date}</span>
+                        </div>
+                        <p style={{ fontSize: 13, color: '#334155', lineHeight: 1.55, margin: 0 }}>{v.text}</p>
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>{v.handle}</span>
-                      <span style={{ fontSize: 11, color: '#94a3b8', marginLeft: 'auto' }}>{v.date}</span>
-                    </div>
-                    <p style={{ fontSize: 13, color: '#334155', lineHeight: 1.55, margin: 0 }}>{v.text}</p>
-                  </div>
-                ))}
+                    )
+                  })}
+                </div>
+                <div style={{ padding: '12px 18px', borderTop: '1px solid #f1f5f9' }}>
+                  <a
+                    href="#"
+                    onClick={e => e.preventDefault()}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: '#2563eb', textDecoration: 'none' }}
+                  >
+                    View all {topic.verbatims.social.length}+ posts <ExternalLink size={12} />
+                  </a>
+                </div>
               </div>
-            </div>
-          )}
+            )
+          })()}
 
           {/* CC verbatims (if any) */}
           {topic && topic.verbatims.cc.length > 0 && (
