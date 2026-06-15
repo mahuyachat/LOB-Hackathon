@@ -37,7 +37,7 @@ export function EISidebar({ activePage, onNavigate, onBackToAdmin, pendingCount 
           }}>✦</div>
           <div>
             <div style={{ color: '#fff', fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>
-              Social
+              Market
             </div>
             <div style={{ color: '#fff', fontSize: 13, fontWeight: 700, lineHeight: 1.2 }}>
               Intelligence
