@@ -130,11 +130,11 @@ function SocialMentionsTile({ value, sparklineData, sparklineColor }: SocialMent
   const trendUp = delta >= 0
 
   return (
-    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div style={{ fontSize: 11, fontWeight: 500, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 20px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+      <div style={{ fontSize: 11, fontWeight: 500, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 14 }}>
         Social Mentions
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
         <span style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>{typeof value === 'number' ? value.toLocaleString() : value}</span>
         <span style={{
           display: 'inline-flex', alignItems: 'center',
@@ -160,12 +160,12 @@ interface SentimentBreakdownTileProps {
 
 function SentimentBreakdownTile({ negPct, neutPct, posPct }: SentimentBreakdownTileProps) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ fontSize: 11, fontWeight: 500, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 20px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+      <div style={{ fontSize: 11, fontWeight: 500, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 14 }}>
         Avg Sentiment
       </div>
       {/* Distribution bar */}
-      <div style={{ display: 'flex', height: 6, borderRadius: 9999, overflow: 'hidden', gap: 1 }}>
+      <div style={{ display: 'flex', height: 6, borderRadius: 9999, overflow: 'hidden', gap: 1, marginBottom: 14 }}>
         <div style={{ flex: negPct, background: '#ef4444' }} />
         <div style={{ flex: neutPct, background: '#94a3b8' }} />
         <div style={{ flex: posPct, background: '#22c55e' }} />
@@ -284,7 +284,7 @@ function addVariance(vals: number[], seedOffset = 0): number[] {
 
 // Generates a 30-point series by repeating the 7-day pattern with gradual upward drift + variance
 function expandToMonth(weekVals: number[], seedOffset = 0): number[] {
-  const base = [...weekVals, ...weekVals, ...weekVals, ...weekVals].slice(0, 30)
+  const base = [...weekVals, ...weekVals, ...weekVals, ...weekVals, ...weekVals].slice(0, 30)
   const drifted = base.map((v, i) => Math.round(v * (0.75 + (i / 29) * 0.45)))
   return addVariance(drifted, seedOffset)
 }
@@ -458,7 +458,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
   const [timeRange, setTimeRange] = useState<'week' | 'month'>('week')
 
   // ── Blind spot data setup ──────────────────────────────────
-  const bsOrder = ['bs-1', 'bs-4', 'bs-2', 'bs-5', 'bs-3', 'bs-6']
+  const bsOrder = ['bs-4', 'bs-1', 'bs-2', 'bs-5', 'bs-3', 'bs-6']
   const sortedBlindSpots = bsOrder
     .map(id => blindSpotTopics.find(t => t.id === id))
     .filter(Boolean) as typeof blindSpotTopics
@@ -544,7 +544,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
     : emMonthRows.map(r => r.twitter + r.facebook + r.reddit + r.instagram)
   const activeStartLabel = timeRange === 'week' ? DAY_LABELS[0] : MONTH_LABELS[0]
   const activeEndLabel   = timeRange === 'week' ? DAY_LABELS[DAY_LABELS.length - 1] : MONTH_LABELS[MONTH_LABELS.length - 1]
-  const activeDateLabel  = timeRange === 'week' ? 'Last 7 days · Jun 4 – Jun 11, 2026' : 'Last 30 days · May 13 – Jun 11, 2026'
+  const activeDateLabel  = timeRange === 'week' ? 'Jun 4 – Jun 11, 2026' : 'May 13 – Jun 11, 2026'
 
   const emTotalCC = emergingTopics.reduce((s, t) => s + t.ccVolume, 0)
   const emTotalSocial = emergingTopics.reduce((s, t) => s + t.socialVolume, 0)
