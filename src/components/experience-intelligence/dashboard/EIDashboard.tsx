@@ -421,11 +421,16 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                 Blind Spots — {bsHighCount} high urgency
               </div>
               <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {top4BS.map(topic => (
-                  <li key={topic.id} style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', lineHeight: '18px' }}>
-                    {topic.name}
-                  </li>
-                ))}
+                {top4BS.map(topic => {
+                  const card = getCardByTopicId(topic.id)
+                  const urgency = card?.urgency ?? 'medium'
+                  return (
+                    <li key={topic.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ width: 7, height: 7, borderRadius: '50%', background: urgencyColor(urgency), flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', lineHeight: '18px' }}>{topic.name}</span>
+                    </li>
+                  )
+                })}
               </ul>
             </div>
 
@@ -524,11 +529,16 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                 Emerging Topics — {emergingTopics.length} confirmed
               </div>
               <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {sortedEmerging.map(topic => (
-                  <li key={topic.id} style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', lineHeight: '18px' }}>
-                    {topic.name}
-                  </li>
-                ))}
+                {sortedEmerging.map(topic => {
+                  const card = getCardByTopicId(topic.id)
+                  const urgency = card?.urgency ?? 'medium'
+                  return (
+                    <li key={topic.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ width: 7, height: 7, borderRadius: '50%', background: urgencyColor(urgency), flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', lineHeight: '18px' }}>{topic.name}</span>
+                    </li>
+                  )
+                })}
               </ul>
             </div>
 
