@@ -1,5 +1,6 @@
 import { TrendingUp, AlertTriangle, Shield } from 'lucide-react'
 import type { Zone } from '@/data/eiMockData'
+export { ROOT_CAUSE_CONFIG } from '@/data/eiMockData'
 
 type ZoneConfig = { label: string; bg: string; text: string; border: string; Icon: typeof TrendingUp }
 

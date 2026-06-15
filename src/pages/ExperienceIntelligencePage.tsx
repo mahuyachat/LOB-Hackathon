@@ -49,7 +49,7 @@ export function ExperienceIntelligencePage({ onBackToAdmin }: Props) {
 
   const pendingBlindSpots = blindSpotTopics.filter(t => {
     const card = RECOMMENDATION_CARDS.find(c => c.topicId === t.id)
-    return !card || cardState.statuses[card.id] === 'pending'
+    return !card || (cardState.statuses[card.id] ?? 'pending') === 'pending'
   }).length
 
   const handleApprove = useCallback((cardId: string) => dispatch({ type: 'APPROVE', cardId }), [])
@@ -93,6 +93,7 @@ export function ExperienceIntelligencePage({ onBackToAdmin }: Props) {
           pendingBlindSpots={pendingBlindSpots}
           onTopicClick={handleTopicClick}
           onOpenRecommendation={(topicId) => setFocusedCardTopicId(topicId)}
+          cardStatuses={cardState.statuses}
         />
       ) : page === 'recommendations' ? (
         <RecommendationsPage
@@ -117,7 +118,7 @@ function DataSourcesPage({ onReset }: { onReset: () => void }) {
     <div style={{ flex: 1, overflowY: 'auto', background: '#f8fafc' }}>
       <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '16px 32px' }}>
         <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#f97316', marginBottom: 4 }}>
-          ✦ Experience Intelligence
+          ✦ Social Intelligence
         </div>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', margin: 0 }}>Data Sources</h1>
         <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>

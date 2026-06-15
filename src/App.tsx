@@ -395,7 +395,7 @@ export default function App() {
       setFlow('feedback')
       setFiSection('dashboard')
       setPage('campaign-portfolio')
-    } else if (appLabel === 'Experience Intelligence') {
+    } else if (appLabel === 'Social Intelligence') {
       setFlow('experience-intelligence')
     } else if (appLabel === 'Admin') setFlow('admin')
     // other apps: no-op

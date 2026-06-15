@@ -248,6 +248,9 @@ export const TOPICS: Topic[] = [
       social: [
         { text: "@Delta app crashed 4 times while I was trying to rebook after cancellation. Had to wait 2hrs on hold instead. FIX YOUR APP.", date: 'Jun 10', handle: '@apphatesme' },
         { text: "The @Delta fly delta app is completely broken. Can't check in, can't see my seat, nothing works. Absolute disaster.", date: 'Jun 9', handle: '@techfrustrated_' },
+        { text: "@Delta app keeps logging me out mid-booking. Lost my seat selection twice. This is embarrassing for a major airline.", date: 'Jun 9', handle: '@delta_apprage' },
+        { text: "Tried to rebook on the @Delta app after my flight was cancelled. Spinner for 20 min then kicked me out. Had to call.", date: 'Jun 8', handle: '@stranded_atl' },
+        { text: "@Delta your app shows my flight as 'on time' but the gate board says delayed 3 hours. Which is it?", date: 'Jun 8', handle: '@confused_flyer' },
       ],
     },
   },
@@ -277,6 +280,9 @@ export const TOPICS: Topic[] = [
       social: [
         { text: "@Delta your booking system won't let me apply my travel credit. Error code 404 every time. Tried 6 times.", date: 'Jun 10', handle: '@frequentflyer_d' },
         { text: "Tried to book a flight on @Delta website for 30 min. Page kept refreshing. No confirmation, no error message. Just stuck.", date: 'Jun 9', handle: '@bookingfrustrate' },
+        { text: "@Delta charged my card twice but says no booking exists. Can't get through on the phone. This is unacceptable.", date: 'Jun 9', handle: '@doubled_charge' },
+        { text: "The @Delta website is down again during the busiest booking weekend. Can't select seats, can't confirm payment.", date: 'Jun 8', handle: '@peak_booking' },
+        { text: "@Delta miles won't apply at checkout. System says I have 42k miles but the booking page ignores them completely.", date: 'Jun 8', handle: '@milesnotworking' },
       ],
     },
   },
@@ -306,6 +312,9 @@ export const TOPICS: Topic[] = [
       social: [
         { text: "Paid $28 for @Delta Wi-Fi on a 4hr flight. Couldn't load a single email. Complete waste of money.", date: 'Jun 10', handle: '@inflight_rage' },
         { text: "@Delta Wi-Fi disconnects every 10 minutes. Useless for anything work-related. You charge too much for this quality.", date: 'Jun 9', handle: '@biz_traveler_k' },
+        { text: "Why does @Delta still have 2015-era Wi-Fi speeds in 2026? United and AA are both better on the same routes.", date: 'Jun 9', handle: '@wifi_compare' },
+        { text: "@Delta charged me $35 for Wi-Fi that didn't work for the last 2 hours of the flight. No refund offered.", date: 'Jun 8', handle: '@inflight_scam' },
+        { text: "Three @Delta flights this week. Wi-Fi worked on zero of them. Stop selling something you can't deliver.", date: 'Jun 8', handle: '@road_warrior_t' },
       ],
     },
   },
@@ -335,6 +344,9 @@ export const TOPICS: Topic[] = [
       social: [
         { text: "@Delta just charged me $45 for a bag that was 3lbs over. This nickel-and-diming is why people switch to Southwest.", date: 'Jun 10', handle: '@baggage_furious' },
         { text: "Why does @Delta charge for a first bag when every other airline includes it? Just raise the ticket price and stop the games.", date: 'Jun 9', handle: '@fee_transparency' },
+        { text: "@Delta agent told me my bag was free with my card benefit, then charged me anyway at the gate. Now no one will refund it.", date: 'Jun 9', handle: '@gate_charge' },
+        { text: "Bag fee went from $30 to $40 with zero notice. Found out at check-in. Thanks for nothing @Delta.", date: 'Jun 8', handle: '@surprise_fees' },
+        { text: "@Delta I fly 60 segments a year and you still charged me a bag fee due to a status glitch. Three calls and still unresolved.", date: 'Jun 8', handle: '@medallion_mad' },
       ],
     },
   },
@@ -364,6 +376,9 @@ export const TOPICS: Topic[] = [
       social: [
         { text: "Switching to @United after this trip. At least they rebooked me same-day. @Delta couldn't even do that after 3 calls.", date: 'Jun 9', handle: '@switching_soon' },
         { text: "@AmericanAir quoted me the same route $120 cheaper. After this @Delta experience I know where I'm going next time.", date: 'Jun 8', handle: '@loyalnotanymore' },
+        { text: "Used to be a @Delta loyalist. After this week I booked my next 4 trips on @Southwest. Done.", date: 'Jun 9', handle: '@ex_loyalist' },
+        { text: "@JetBlue handled my rebooking in 8 minutes on their app. @Delta had me on hold for 2 hours. Not hard to see why I'm switching.", date: 'Jun 8', handle: '@jetblue_convert' },
+        { text: "Delta SkyMiles vs United MileagePlus — I ran the numbers. For my routes, United wins by a mile. Literally. Bye @Delta.", date: 'Jun 8', handle: '@points_nerd' },
       ],
     },
   },
@@ -393,6 +408,9 @@ export const TOPICS: Topic[] = [
       social: [
         { text: "Pre-booked wheelchair assistance on @Delta. Nobody was at the gate. My elderly mother had to walk the full terminal alone. Unacceptable.", date: 'Jun 10', handle: '@accessibility_now' },
         { text: "@Delta I requested special meal and medical device accommodation. Neither was on record when I boarded. Not okay.", date: 'Jun 9', handle: '@travelwdisability' },
+        { text: "@Delta confirmed my aisle seat for mobility reasons three times. Boarded to find I'd been moved to a middle seat with no notice.", date: 'Jun 9', handle: '@mobility_needed' },
+        { text: "Travelling with a hearing impairment. @Delta gate agents made zero effort to communicate visually during boarding chaos. Felt completely ignored.", date: 'Jun 8', handle: '@deaf_traveler' },
+        { text: "@Delta I pre-arranged extra time boarding for my autistic son. Agent rushed us anyway. Please train your staff.", date: 'Jun 8', handle: '@special_needs_dad' },
       ],
     },
   },

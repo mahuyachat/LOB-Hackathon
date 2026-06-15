@@ -107,11 +107,51 @@ function SparklineChart({ data, showCc, showSocial }: { data: SparkPoint[]; show
   )
 }
 
-function SentimentBar({ cc, social, ccHasData, socialHasData }: { cc: number; social: number; ccHasData: boolean; socialHasData: boolean }) {
-  // bar goes from -1 to +1; 0 is center
+function SentimentBar({ cc, social, ccHasData, socialHasData, isBlindSpot = false }: { cc: number; social: number; ccHasData: boolean; socialHasData: boolean; isBlindSpot?: boolean }) {
   const toPercent = (v: number) => ((v + 1) / 2) * 100
   const ccPct = toPercent(cc)
   const socialPct = toPercent(social)
+
+  if (isBlindSpot) {
+    return (
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#64748b' }}>
+            Social Sentiment
+          </div>
+          <SentimentPill score={social} hasData={socialHasData} />
+        </div>
+        <div style={{ position: 'relative', height: 36, marginBottom: 6 }}>
+          <div style={{
+            position: 'absolute', top: '50%', left: 0, right: 0,
+            height: 6, borderRadius: 3, transform: 'translateY(-50%)',
+            background: 'linear-gradient(90deg, #fecaca 0%, #fde68a 50%, #bbf7d0 100%)',
+          }} />
+          <div style={{
+            position: 'absolute', top: '10%', bottom: '10%', left: '50%',
+            width: 1, background: '#94a3b8',
+          }} />
+          {socialHasData && (
+            <div
+              title={`Social Media avg: ${social.toFixed(2)}`}
+              style={{
+                position: 'absolute', top: '50%', left: `${socialPct}%`,
+                width: 14, height: 14, borderRadius: '50%',
+                background: '#f97316', border: '2px solid #fff',
+                transform: 'translate(-50%, -50%)',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+              }}
+            />
+          )}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94a3b8' }}>
+          <span>Very Negative (−1)</span>
+          <span>Neutral (0)</span>
+          <span>Very Positive (+1)</span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -133,18 +173,15 @@ function SentimentBar({ cc, social, ccHasData, socialHasData }: { cc: number; so
 
       {/* Position bar */}
       <div style={{ position: 'relative', height: 36, marginBottom: 6 }}>
-        {/* Track with sentiment gradient */}
         <div style={{
           position: 'absolute', top: '50%', left: 0, right: 0,
           height: 6, borderRadius: 3, transform: 'translateY(-50%)',
           background: 'linear-gradient(90deg, #fecaca 0%, #fde68a 50%, #bbf7d0 100%)',
         }} />
-        {/* Center line */}
         <div style={{
           position: 'absolute', top: '10%', bottom: '10%', left: '50%',
           width: 1, background: '#94a3b8',
         }} />
-        {/* Contact Center marker */}
         {ccHasData && (
           <div
             title={`Contact Center avg: ${cc.toFixed(2)}`}
@@ -157,7 +194,6 @@ function SentimentBar({ cc, social, ccHasData, socialHasData }: { cc: number; so
             }}
           />
         )}
-        {/* Social marker */}
         {socialHasData && (
           <div
             title={`Social Media avg: ${social.toFixed(2)}`}
@@ -171,19 +207,19 @@ function SentimentBar({ cc, social, ccHasData, socialHasData }: { cc: number; so
           />
         )}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94a3b8', marginBottom: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94a3b8', marginBottom: 10 }}>
         <span>Very Negative (−1)</span>
         <span>Neutral (0)</span>
         <span>Very Positive (+1)</span>
       </div>
-      <div style={{ display: 'flex', gap: 20, fontSize: 12, color: '#334155' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#3b82f6', display: 'inline-block' }} />
-          Contact Center: <strong>{ccHasData ? cc.toFixed(2) : '—'}</strong>
+      <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#475569' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#3b82f6', display: 'inline-block', flexShrink: 0 }} />
+          Contact Center
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#f97316', display: 'inline-block' }} />
-          Social Media: <strong>{socialHasData ? social.toFixed(2) : '—'}</strong>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#f97316', display: 'inline-block', flexShrink: 0 }} />
+          Social Media
         </span>
       </div>
     </div>
@@ -212,7 +248,7 @@ export function TopicDrilldown({ topicId, cardStatuses, approvedAt, onBack, onAp
             color: '#64748b', fontSize: 13, padding: 0, marginBottom: 10,
           }}
         >
-          <ArrowLeft size={14} /> Back to Signal Intelligence
+          <ArrowLeft size={14} /> Back to Social Intelligence Monitoring
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', margin: 0 }}>{topic.name}</h1>
@@ -232,16 +268,18 @@ export function TopicDrilldown({ topicId, cardStatuses, approvedAt, onBack, onAp
       <div style={{ padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 24 }}>
 
         {/* Metrics row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 24px' }}>
-            <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#64748b', marginBottom: 4 }}>
-              Contact Center Volume (7-day)
+        <div style={{ display: 'grid', gridTemplateColumns: topic.zone === 'blind-spot' ? '1fr' : '1fr 1fr', gap: 16 }}>
+          {topic.zone !== 'blind-spot' && (
+            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 24px' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#64748b', marginBottom: 4 }}>
+                Contact Center Volume (7-day)
+              </div>
+              <div style={{ fontSize: 32, fontWeight: 700, color: '#1d4ed8' }}>
+                {topic.ccVolume > 0 ? topic.ccVolume.toLocaleString() : '—'}
+              </div>
+              <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>contact center interactions</div>
             </div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: '#1d4ed8' }}>
-              {topic.ccVolume > 0 ? topic.ccVolume.toLocaleString() : '—'}
-            </div>
-            <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>contact center interactions</div>
-          </div>
+          )}
           <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 24px' }}>
             <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#64748b', marginBottom: 4 }}>
               Social Volume (7-day)
@@ -268,38 +306,32 @@ export function TopicDrilldown({ topicId, cardStatuses, approvedAt, onBack, onAp
             social={topic.sentiment.social}
             ccHasData={topic.ccVolume > 0}
             socialHasData={topic.socialVolume > 0}
+            isBlindSpot={topic.zone === 'blind-spot'}
           />
         </div>
 
         {/* Verbatims */}
         <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>Sample Verbatims</div>
-            {topic.socialVolume > 0 && (
-              <a
-                href="#"
-                onClick={e => e.preventDefault()}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  fontSize: 13, fontWeight: 600, color: '#f97316',
-                  textDecoration: 'none', borderBottom: '1px solid #fed7aa',
-                  paddingBottom: 1,
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#ea580c')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#f97316')}
-              >
-                View all {topic.socialVolume.toLocaleString()} mentions
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </a>
-            )}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>Recent Mentions</div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            {/* Contact Center */}
+          <div style={{ display: 'grid', gridTemplateColumns: topic.zone === 'blind-spot' ? '1fr' : '1fr 1fr', gap: 16 }}>
+            {/* Contact Center — hidden for blind spots */}
+            {topic.zone !== 'blind-spot' && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>
-                🎙 Contact Center
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  🎙 Contact Center
+                </div>
+                {topic.ccVolume > 0 && (
+                  <a href="#" onClick={e => e.preventDefault()} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#1d4ed8', textDecoration: 'none', borderBottom: '1px solid #bfdbfe', paddingBottom: 1 }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#1e40af')}
+                    onMouseLeave={e => (e.currentTarget.style.color = '#1d4ed8')}
+                  >
+                    Show all {topic.ccVolume.toLocaleString()} mentions
+                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </a>
+                )}
               </div>
               {topic.verbatims.cc.length > 0 ? topic.verbatims.cc.map((v, i) => (
                 <div key={i} style={{
@@ -315,10 +347,22 @@ export function TopicDrilldown({ topicId, cardStatuses, approvedAt, onBack, onAp
                 </div>
               )}
             </div>
+            )}
             {/* Social */}
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>
-                𝕏 Social Posts
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#f97316', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  𝕏 Social Posts
+                </div>
+                {topic.socialVolume > 0 && (
+                  <a href="#" onClick={e => e.preventDefault()} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#f97316', textDecoration: 'none', borderBottom: '1px solid #fed7aa', paddingBottom: 1 }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#ea580c')}
+                    onMouseLeave={e => (e.currentTarget.style.color = '#f97316')}
+                  >
+                    Show all {topic.socialVolume.toLocaleString()} mentions
+                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </a>
+                )}
               </div>
               {topic.verbatims.social.length > 0 ? topic.verbatims.social.map((v, i) => (
                 <div key={i} style={{

@@ -24,9 +24,6 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
         justifyContent: 'space-between',
       }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#f97316', marginBottom: 2 }}>
-            ✦ Experience Intelligence
-          </div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#0f172a' }}>Delta Air Lines</div>
         </div>
         <div style={{ textAlign: 'right' }}>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { CheckCircle, X, AlertTriangle } from 'lucide-react'
+import { CheckCircle, AlertTriangle } from 'lucide-react'
 import type { RecommendationCard as CardType } from '@/data/eiMockData'
-import { ZoneBadge } from '../shared/ZoneBadge'
+import { ZoneBadge, ROOT_CAUSE_CONFIG } from '../shared/ZoneBadge'
 
 interface Props {
   card: CardType
@@ -76,6 +76,29 @@ export function RecommendationCard({ card, status, onApprove, onDismiss }: Props
             <AlertTriangle size={12} />
             {card.trendLabel}
           </div>
+
+          {/* Root cause pattern badge */}
+          {(() => {
+            const rc = ROOT_CAUSE_CONFIG[card.rootCausePattern]
+            return (
+              <div style={{
+                display: 'flex', alignItems: 'flex-start', gap: 10,
+                background: rc.bg, border: `1px solid ${rc.border}`,
+                borderLeft: `3px solid ${rc.border}`, borderRadius: 6,
+                padding: '10px 12px', marginBottom: 12,
+              }}>
+                <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>{rc.icon}</span>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: rc.text, marginBottom: 3 }}>
+                    {rc.label}
+                  </div>
+                  <p style={{ fontSize: 12, color: rc.text, opacity: 0.85, margin: 0, lineHeight: 1.5, fontStyle: 'italic' }}>
+                    {card.rootCauseExplanation}
+                  </p>
+                </div>
+              </div>
+            )
+          })()}
 
           {/* Why you're missing it */}
           <div style={{ marginBottom: 10 }}>
