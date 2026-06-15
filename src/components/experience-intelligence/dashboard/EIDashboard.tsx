@@ -420,7 +420,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
               <div style={{ fontSize: 13, fontWeight: 600, color: '#991b1b' }}>
                 Blind Spots — {bsHighCount} high urgency
               </div>
-              <ul style={{ margin: 0, padding: '0 0 0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {top4BS.map(topic => (
                   <li key={topic.id} style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', lineHeight: '18px' }}>
                     {topic.name}
@@ -523,7 +523,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
               <div style={{ fontSize: 13, fontWeight: 600, color: '#c2410c' }}>
                 Emerging Topics — {emergingTopics.length} confirmed
               </div>
-              <ul style={{ margin: 0, padding: '0 0 0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {sortedEmerging.map(topic => (
                   <li key={topic.id} style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', lineHeight: '18px' }}>
                     {topic.name}
