@@ -74,6 +74,26 @@ function MiniSparkline({ data, color }: { data: number[]; color: string }) {
 }
 
 function StatTile({ label, value, chip, chipColor, chipBg, onClick, sparklineData, sparklineColor }: StatTileProps) {
+  const trendChip = (() => {
+    if (!sparklineData || sparklineData.length < 2) return null
+    const latest = sparklineData[sparklineData.length - 1]
+    const prev = sparklineData[sparklineData.length - 2]
+    const delta = latest - prev
+    const pct = prev > 0 ? Math.round((delta / prev) * 100) : 0
+    const up = delta >= 0
+    return (
+      <span style={{
+        display: 'inline-flex', alignItems: 'center',
+        background: up ? '#fee2e2' : '#dcfce7',
+        color: up ? '#dc2626' : '#16a34a',
+        borderRadius: 9999, padding: '2px 8px',
+        fontSize: 11, fontWeight: 700,
+      }}>
+        {up ? '+' : ''}{pct}%
+      </span>
+    )
+  })()
+
   return (
     <div
       onClick={onClick}
@@ -81,34 +101,31 @@ function StatTile({ label, value, chip, chipColor, chipBg, onClick, sparklineDat
         background: '#fff',
         border: '1px solid #e2e8f0',
         borderRadius: 12,
-        padding: '16px 18px',
+        padding: '20px 20px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 8,
+        gap: 0,
         cursor: onClick ? 'pointer' : 'default',
       }}
     >
-      <div style={{ fontSize: 11, fontWeight: 500, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div style={{ fontSize: 11, fontWeight: 500, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 14 }}>
         {label}
       </div>
-      <div style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>{value}</div>
-      {sparklineData && sparklineData.length >= 2 ? (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+        <span style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>{value}</span>
+        {trendChip ?? (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+            background: chipBg, color: chipColor,
+            borderRadius: 9999, padding: '2px 8px',
+            fontSize: 11, fontWeight: 500,
+          }}>
+            {chip}
+          </div>
+        )}
+      </div>
+      {sparklineData && sparklineData.length >= 2 && (
         <MiniSparkline data={sparklineData} color={sparklineColor ?? '#64748b'} />
-      ) : (
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          background: chipBg,
-          color: chipColor,
-          borderRadius: 9999,
-          padding: '2px 8px',
-          fontSize: 11,
-          fontWeight: 500,
-          alignSelf: 'flex-start',
-        }}>
-          {chip}
-        </div>
       )}
     </div>
   )
