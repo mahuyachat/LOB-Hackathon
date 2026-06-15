@@ -115,7 +115,6 @@ export function SingleRecommendationView({
     low:    { bg: '#f0fdf4', text: '#14532d', border: '#bbf7d0', dot: '#22c55e', badge: '#16a34a' },
   }
   const uc = urgencyColors[card.urgency]
-  const rc = ROOT_CAUSE_CONFIG[card.rootCausePattern]
 
   const sentScore = topic.sentiment?.social ?? -0.5
   const sc = sentimentColor(sentScore)
@@ -124,6 +123,10 @@ export function SingleRecommendationView({
   const ti = STEP_THEME.identify
   const ta = STEP_THEME.assess
   const tr = STEP_THEME.resolve
+
+  const rc = card.rootCausePattern
+    ? ROOT_CAUSE_CONFIG[card.rootCausePattern]
+    : { icon: '📊', bg: '#eff6ff', text: '#1e40af', border: '#bfdbfe', label: 'Emerging Signal' }
 
   // Shared card style
   const colCard = (borderColor: string): React.CSSProperties => ({
