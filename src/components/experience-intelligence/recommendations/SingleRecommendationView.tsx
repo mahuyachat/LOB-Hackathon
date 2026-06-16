@@ -93,6 +93,7 @@ export function SingleRecommendationView({
   const [toast, setToast] = useState<string | null>(null)
   const [postsOpen, setPostsOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+  const [allPostsOpen, setAllPostsOpen] = useState(false)
 
   const card = RECOMMENDATION_CARDS.find(c => c.topicId === topicId)
   const topic = getTopicById(topicId)
@@ -328,8 +329,8 @@ export function SingleRecommendationView({
               </div>
 
               <div style={{ padding: '12px 22px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <a href="#" onClick={e => e.preventDefault()} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: '#2563eb', textDecoration: 'none' }}>
-                  View all {topic.verbatims.social.length}+ posts <ExternalLink size={12} />
+                <a href="#" onClick={e => { e.preventDefault(); setAllPostsOpen(true) }} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: '#2563eb', textDecoration: 'none' }}>
+                  View all {topic.verbatims.social.length} posts <ExternalLink size={12} />
                 </a>
                 {topic.verbatims.cc.length > 0 && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#64748b' }}>
@@ -360,6 +361,42 @@ export function SingleRecommendationView({
               <button onClick={() => setModalOpen(false)} style={{ padding: '10px 18px', background: '#fff', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 14, cursor: 'pointer' }}>
                 Cancel
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── All Posts modal ── */}
+      {allPostsOpen && (
+        <div onClick={() => setAllPostsOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, width: 600, maxWidth: '92vw', maxHeight: '80vh', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', borderBottom: '1px solid #e2e8f0', flexShrink: 0 }}>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>All Social Posts</div>
+                <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{topic.verbatims.social.length} posts driving this signal</div>
+              </div>
+              <button onClick={() => setAllPostsOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: 4, borderRadius: 6, display: 'flex', alignItems: 'center' }}>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M14 4L4 14M4 4l10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+              </button>
+            </div>
+            {/* Scrollable post list */}
+            <div style={{ overflowY: 'auto', flex: 1 }}>
+              {topic.verbatims.social.map((v, i) => {
+                const pc = PLATFORM_CONFIG[v.platform]
+                return (
+                  <div key={i} style={{ padding: '16px 24px', borderBottom: i < topic.verbatims.social.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', background: pc.bg, color: pc.color, borderRadius: 4, padding: '2px 6px', flexShrink: 0 }}>
+                        {pc.label}
+                      </span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#334155' }}>{v.handle}</span>
+                      <span style={{ fontSize: 12, color: '#94a3b8', marginLeft: 'auto', flexShrink: 0 }}>{v.date}</span>
+                    </div>
+                    <p style={{ fontSize: 14, color: '#334155', lineHeight: 1.6, margin: 0 }}>{v.text}</p>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
