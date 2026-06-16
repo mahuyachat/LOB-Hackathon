@@ -128,7 +128,13 @@ function StatTile({ label, value, chip, chipColor, chipBg, onClick, sparklineDat
         )}
       </div>
       {sparklineData && sparklineData.length >= 2 && (
-        <MiniSparkline data={sparklineData} color={sparklineColor ?? '#64748b'} width={200} height={48} fullWidth />
+        <>
+          <MiniSparkline data={sparklineData} color={sparklineColor ?? '#64748b'} width={200} height={48} fullWidth />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+            <span style={{ fontSize: 9, color: '#cbd5e1' }}>Mon Jun 4</span>
+            <span style={{ fontSize: 9, color: '#cbd5e1' }}>Sun Jun 10</span>
+          </div>
+        </>
       )}
     </div>
   )
@@ -167,6 +173,10 @@ function SocialMentionsTile({ value, sparklineData, sparklineColor }: SocialMent
         </span>
       </div>
       <MiniSparkline data={sparklineData} color={sparklineColor} width={200} height={48} fullWidth />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+        <span style={{ fontSize: 9, color: '#cbd5e1' }}>Mon Jun 4</span>
+        <span style={{ fontSize: 9, color: '#cbd5e1' }}>Sun Jun 10</span>
+      </div>
     </div>
   )
 }
@@ -381,12 +391,12 @@ function SingleChannelSparkline({ rows, channelKey, color, label, width = 200, h
         {latest.toLocaleString()}
         <span style={{ fontSize: 11, fontWeight: 400, color: '#94a3b8', marginLeft: 4 }}>mentions</span>
       </div>
-      <svg width={width - 32} height={height} viewBox={`0 0 ${width - 32} ${height}`} style={{ overflow: 'visible', display: 'block' }}>
+      <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" style={{ display: 'block' }}>
         <polygon points={areaPoints} fill={color} fillOpacity={0.08} />
         <polyline points={pts} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
         <circle cx={toX(data.length - 1)} cy={toY(latest)} r={3} fill={color} />
       </svg>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
         <span style={{ fontSize: 9, color: '#cbd5e1' }}>{startLabel ?? DAY_LABELS[0]}</span>
         <span style={{ fontSize: 9, color: '#cbd5e1' }}>{endLabel ?? DAY_LABELS[DAY_LABELS.length - 1]}</span>
       </div>
