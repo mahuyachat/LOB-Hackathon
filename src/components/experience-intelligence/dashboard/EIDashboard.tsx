@@ -131,8 +131,8 @@ function StatTile({ label, value, chip, chipColor, chipBg, onClick, sparklineDat
         <>
           <MiniSparkline data={sparklineData} color={sparklineColor ?? '#64748b'} width={200} height={48} fullWidth />
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-            <span style={{ fontSize: 9, color: '#cbd5e1' }}>Mon Jun 4</span>
-            <span style={{ fontSize: 9, color: '#cbd5e1' }}>Sun Jun 10</span>
+            <span style={{ fontSize: 9, color: '#64748b' }}>Mon Jun 4</span>
+            <span style={{ fontSize: 9, color: '#64748b' }}>Sun Jun 10</span>
           </div>
         </>
       )}
@@ -174,8 +174,8 @@ function SocialMentionsTile({ value, sparklineData, sparklineColor }: SocialMent
       </div>
       <MiniSparkline data={sparklineData} color={sparklineColor} width={200} height={48} fullWidth />
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-        <span style={{ fontSize: 9, color: '#cbd5e1' }}>Mon Jun 4</span>
-        <span style={{ fontSize: 9, color: '#cbd5e1' }}>Sun Jun 10</span>
+        <span style={{ fontSize: 9, color: '#64748b' }}>Mon Jun 4</span>
+        <span style={{ fontSize: 9, color: '#64748b' }}>Sun Jun 10</span>
       </div>
     </div>
   )
@@ -397,8 +397,8 @@ function SingleChannelSparkline({ rows, channelKey, color, label, width = 200, h
         <circle cx={toX(data.length - 1)} cy={toY(latest)} r={3} fill={color} />
       </svg>
       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-        <span style={{ fontSize: 9, color: '#cbd5e1' }}>{startLabel ?? DAY_LABELS[0]}</span>
-        <span style={{ fontSize: 9, color: '#cbd5e1' }}>{endLabel ?? DAY_LABELS[DAY_LABELS.length - 1]}</span>
+        <span style={{ fontSize: 9, color: '#64748b' }}>{startLabel ?? DAY_LABELS[0]}</span>
+        <span style={{ fontSize: 9, color: '#64748b' }}>{endLabel ?? DAY_LABELS[DAY_LABELS.length - 1]}</span>
       </div>
     </div>
   )
