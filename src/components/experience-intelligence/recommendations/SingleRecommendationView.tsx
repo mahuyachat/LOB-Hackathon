@@ -219,8 +219,8 @@ export function SingleRecommendationView({
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>03</div>
               <div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>Resolve</div>
-                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 3 }}>Issue Mitigation</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>Action</div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 3 }}>Recommended Action</div>
               </div>
             </div>
             {!isApproved && !isDismissed && (

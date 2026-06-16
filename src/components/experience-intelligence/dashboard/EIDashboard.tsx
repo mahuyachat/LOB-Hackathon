@@ -152,7 +152,7 @@ function SocialMentionsTile({ value, sparklineData, sparklineColor }: SocialMent
   return (
     <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 20px', display: 'flex', flexDirection: 'column', gap: 0 }}>
       <div style={{ fontSize: 11, fontWeight: 500, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 14 }}>
-        Social Mentions
+        Total Social Mentions
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
         <span style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>{typeof value === 'number' ? value.toLocaleString() : value}</span>
