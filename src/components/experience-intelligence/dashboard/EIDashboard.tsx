@@ -625,7 +625,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
         ═══════════════════════════════════════════════════ */}
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 18 }}>🔍</span> Blind Spots
+            <span style={{ fontSize: 18 }}>🔍</span> Open Market Signals
             <span style={{
               background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5',
               borderRadius: 9999, padding: '1px 10px', fontSize: 12, fontWeight: 600,
@@ -648,7 +648,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
               gap: 12,
             }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#991b1b' }}>
-                Blind Spots — {bsHighCount} high urgency
+                Open Market Signals — {bsHighCount} high urgency
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 4, borderBottom: '1px solid #e2e8f0' }}>
                 <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8' }}>Topic</span>
@@ -713,7 +713,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
           {/* Row 3: Per-channel trend cards (2×2 grid) */}
           <div style={{ marginTop: 16 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>
-              Social Volume Trends by Channel — Blind Spots
+              Social Volume Trends by Channel — Open Market Signals
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
               {CHANNEL_CONFIG.map(ch => (

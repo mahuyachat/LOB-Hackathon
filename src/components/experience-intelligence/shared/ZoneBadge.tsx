@@ -13,7 +13,7 @@ const CONFIG: Record<Zone, ZoneConfig> = {
     Icon: TrendingUp,
   },
   'blind-spot': {
-    label: 'Blind Spot',
+    label: 'Open Market Signal',
     bg: '#fef2f2',
     text: '#b91c1c',
     border: '#fecaca',
@@ -78,6 +78,6 @@ export const ZONE_COLORS: Record<Zone, string> = {
 
 export const ZONE_TOOLTIPS: Record<Zone, string> = {
   'emerging':       'Emerging Topic — confirmed in both your contact center and public social. High-priority.',
-  'blind-spot':     'Blind Spot — customers are raising this publicly but not with your agents. Recommendation available.',
+  'blind-spot':     'Open Market Signal — customers are raising this publicly but not with your agents. Recommendation available.',
   'private-signal': 'Under-the-Radar — customers are raising this with your agents but it hasn\'t surfaced publicly yet.',
 }
