@@ -661,7 +661,7 @@ export const RECOMMENDATION_CARDS: RecommendationCard[] = [
     urgency: 'high',
     rootCausePattern: 'policy-disagreement',
     rootCauseLabel: 'Policy Disagreement',
-    rootCauseExplanation: 'The baggage fee is charged per-direction, but this is not clearly communicated at booking. Customers who paid at outbound check-in arrive at the return gate expecting to board — and are charged again. Agents cannot waive the fee, so customers never call. They post instead.',
+    rootCauseExplanation: 'The baggage fee is charged per-direction, but this is not clearly communicated at booking. Customers who paid at outbound check-in, arrive at the return gate expecting to board — and are charged again. Agents cannot waive the fee, so customers never call. They post instead.',
     actionType: 'escalate-policy',
     actionLabel: 'Notify Business Leadership',
     actionDetail: 'A briefing will be prepared for Business Leadership summarising the social volume trend, verbatim samples, and week-over-week growth. The goal is to surface this as a recurring policy pain point that warrants a business-level review.',
