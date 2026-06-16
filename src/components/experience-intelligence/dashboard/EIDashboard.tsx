@@ -5,6 +5,7 @@ interface Props {
   pendingBlindSpots: number
   onTopicClick: (topicId: string) => void
   onOpenRecommendation: (topicId: string) => void
+  cardStatuses?: Record<string, 'pending' | 'approved' | 'dismissed'>
 }
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -225,9 +226,10 @@ interface RecommendationCardProps {
   urgency: 'high' | 'medium' | 'low'
   whyMissing?: string
   onAction: () => void
+  isActioned?: boolean
 }
 
-function RecommendationCardItem({ topicId, topicName, urgency, whyMissing, onAction }: RecommendationCardProps) {
+function RecommendationCardItem({ topicId, topicName, urgency, whyMissing, onAction, isActioned }: RecommendationCardProps) {
   const truncated = whyMissing
     ? whyMissing.length > 120
       ? whyMissing.slice(0, 117) + '…'
@@ -249,19 +251,27 @@ function RecommendationCardItem({ topicId, topicName, urgency, whyMissing, onAct
     }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', lineHeight: '20px' }}>{topicName}</div>
-        <span style={{
-          background: urgencyBg(urgency),
-          color: urgencyColor(urgency),
-          border: `1px solid ${urgencyBorder(urgency)}`,
-          borderRadius: 9999,
-          padding: '2px 8px',
-          fontSize: 11,
-          fontWeight: 600,
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
-        }}>
-          {urgency.toUpperCase()}
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+          {isActioned && (
+            <span style={{
+              background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0',
+              borderRadius: 9999, padding: '2px 8px', fontSize: 11, fontWeight: 600,
+              whiteSpace: 'nowrap',
+            }}>✓ Actioned</span>
+          )}
+          <span style={{
+            background: urgencyBg(urgency),
+            color: urgencyColor(urgency),
+            border: `1px solid ${urgencyBorder(urgency)}`,
+            borderRadius: 9999,
+            padding: '2px 8px',
+            fontSize: 11,
+            fontWeight: 600,
+            whiteSpace: 'nowrap',
+          }}>
+            {urgency.toUpperCase()}
+          </span>
+        </div>
       </div>
       {truncated && (
         <div style={{ fontSize: 12, color: '#475569', lineHeight: '18px' }}>{truncated}</div>
@@ -312,11 +322,16 @@ function addVariance(vals: number[], seedOffset = 0): number[] {
   return vals.map((v, i) => Math.max(1, Math.round(v + v * (NOISE[(i + seedOffset) % NOISE.length] / 100))))
 }
 
-// Generates a 30-point series by repeating the 7-day pattern with gradual upward drift + variance
+// Generates a 30-point series: moderate start, dip mid-month (weeks 2-3), surge at end
 function expandToMonth(weekVals: number[], seedOffset = 0): number[] {
-  const base = [...weekVals, ...weekVals, ...weekVals, ...weekVals, ...weekVals].slice(0, 30)
-  const drifted = base.map((v, i) => Math.round(v * (0.75 + (i / 29) * 0.45)))
-  return addVariance(drifted, seedOffset)
+  const avg = weekVals.reduce((a, b) => a + b, 0) / weekVals.length
+  const shape = [
+    0.72, 0.68, 0.74, 0.80, 0.76, 0.71, 0.65,  // week 1 — moderate
+    0.58, 0.54, 0.60, 0.66, 0.62, 0.57, 0.52,  // week 2 — dip
+    0.56, 0.61, 0.67, 0.72, 0.68, 0.74, 0.79,  // week 3 — recovery
+    0.84, 0.88, 0.93, 0.97, 1.02, 1.05, 1.08, 1.10, 1.12,  // week 4+ — surge
+  ]
+  return shape.map((m, i) => Math.round(avg * m * (1 + ((seedOffset + i) % 7) * 0.01)))
 }
 
 interface ChannelRow {
@@ -484,7 +499,7 @@ function SectionDivider({ label }: { label: string }) {
 
 // ── Main component ────────────────────────────────────────────
 
-export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendation }: Props) {
+export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendation, cardStatuses }: Props) {
   const [timeRange, setTimeRange] = useState<'week' | 'month'>('week')
 
   // ── Blind spot data setup ──────────────────────────────────
@@ -541,7 +556,8 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
   const emCCRaw = DAY_LABELS.map((_, i) =>
     sortedEmerging.reduce((s, t) => s + (t.sparkline[i]?.cc ?? 0), 0)
   )
-  const emCCVaried = addVariance(emCCRaw, 14)
+  // CC peaks early-week then declines — different pattern from social (which trends upward)
+  const emCCVaried = [11200, 12800, 13400, 11900, 10600, 9800, 9200]
   const emCCSparkline = emCCVaried
 
   const emChannelRows = DAY_LABELS.map((day, i) => ({ day, twitter: emTw[i], facebook: emFb[i], reddit: emRd[i], instagram: emIg[i], cc: emCCVaried[i] }))
@@ -673,12 +689,17 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                       <span style={{ width: 7, height: 7, borderRadius: '50%', background: urgencyColor(urgency), flexShrink: 0 }} />
                       <span style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', lineHeight: '18px', flex: 1 }}>{topic.name}</span>
                       {card && (
-                        <span style={{
-                          fontSize: 11, fontWeight: 700, flexShrink: 0,
-                          background: urgencyBg(urgency), color: urgencyColor(urgency),
-                          border: `1px solid ${urgencyBorder(urgency)}`,
-                          borderRadius: 9999, padding: '1px 7px',
-                        }}>{card.score}</span>
+                        <>
+                          <div style={{ width: 48, height: 4, background: '#f1f5f9', borderRadius: 9999, overflow: 'hidden', flexShrink: 0 }}>
+                            <div style={{ width: `${card.score}%`, height: '100%', background: urgencyColor(urgency), borderRadius: 9999 }} />
+                          </div>
+                          <span style={{
+                            fontSize: 11, fontWeight: 700, flexShrink: 0,
+                            background: urgencyBg(urgency), color: urgencyColor(urgency),
+                            border: `1px solid ${urgencyBorder(urgency)}`,
+                            borderRadius: 9999, padding: '1px 7px',
+                          }}>{card.score}</span>
+                        </>
                       )}
                     </li>
                   )
@@ -714,6 +735,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                     urgency={card.urgency}
                     whyMissing={card.whyMissing}
                     onAction={() => onOpenRecommendation(topic.id)}
+                    isActioned={cardStatuses?.[card.id] === 'approved'}
                   />
                 )
               })}
@@ -786,12 +808,17 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                       <span style={{ width: 7, height: 7, borderRadius: '50%', background: urgencyColor(urgency), flexShrink: 0 }} />
                       <span style={{ fontSize: 13, fontWeight: 500, color: '#1e293b', lineHeight: '18px', flex: 1 }}>{topic.name}</span>
                       {card && (
-                        <span style={{
-                          fontSize: 11, fontWeight: 700, flexShrink: 0,
-                          background: urgencyBg(urgency), color: urgencyColor(urgency),
-                          border: `1px solid ${urgencyBorder(urgency)}`,
-                          borderRadius: 9999, padding: '1px 7px',
-                        }}>{card.score}</span>
+                        <>
+                          <div style={{ width: 48, height: 4, background: '#f1f5f9', borderRadius: 9999, overflow: 'hidden', flexShrink: 0 }}>
+                            <div style={{ width: `${card.score}%`, height: '100%', background: urgencyColor(urgency), borderRadius: 9999 }} />
+                          </div>
+                          <span style={{
+                            fontSize: 11, fontWeight: 700, flexShrink: 0,
+                            background: urgencyBg(urgency), color: urgencyColor(urgency),
+                            border: `1px solid ${urgencyBorder(urgency)}`,
+                            borderRadius: 9999, padding: '1px 7px',
+                          }}>{card.score}</span>
+                        </>
                       )}
                     </li>
                   )
@@ -836,6 +863,7 @@ export function EIDashboard({ pendingBlindSpots, onTopicClick, onOpenRecommendat
                     urgency={card.urgency}
                     whyMissing={card.rootCause}
                     onAction={() => onOpenRecommendation(topic.id)}
+                    isActioned={cardStatuses?.[card.id] === 'approved'}
                   />
                 )
               })}

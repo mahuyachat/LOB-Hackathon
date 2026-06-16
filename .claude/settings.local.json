@@ -13,7 +13,15 @@
       "Bash(git checkout *)",
       "Bash(sudo npm install -g vercel)",
       "Bash(npx vercel *)",
-      "Bash(~/.npm-global/bin/vercel login *)"
+      "Bash(~/.npm-global/bin/vercel login *)",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue)",
+      "Bash(git stash *)",
+      "mcp__Claude_in_Chrome__navigate",
+      "Bash(git commit *)"
     ]
   }
 }
