@@ -668,7 +668,7 @@ export const RECOMMENDATION_CARDS: RecommendationCard[] = [
     topicId: 'bs-4',
     zone: 'blind-spot',
     headline: 'Additional baggage fee complaints are surging on social — customers see a call as futile against a company policy',
-    whyMissing: "Additional baggage fee policy complaints rank #2 on social this week with 1,320 mentions — up 35% — and are absent from contact center data. Customers correctly assess that an agent cannot change the airline's fee structure, so they don't call.",
+    whyMissing: "Additional baggage fee policy complaints rank #1 on social this week with 1,320 mentions — up 35% — and are absent from contact center data. Customers correctly assess that an agent cannot change the airline's fee structure, so they don't call.",
     rootCause: "Additional baggage fee shock at the return gate is triggering active switching intent. Social posts comparing Delta's per-direction fee model to United and Southwest are up 58% week-on-week — a leading indicator of defection among mid-frequency flyers, the most revenue-sensitive segment.",
     recommendedAction: "Notify Business Leadership with the social volume trend as evidence of recurring customer dissatisfaction. This is a policy-level issue — the recurring signal needs to reach decision-makers who can review the fee structure or introduce customer-friendly exceptions.",
     department: "Business Leadership + Revenue",
