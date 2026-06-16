@@ -81,7 +81,7 @@ function StatTile({ label, value, chip, chipColor, chipBg, onClick, sparklineDat
   const trendChip = (() => {
     if (!sparklineData || sparklineData.length < 2) return null
     const latest = sparklineData[sparklineData.length - 1]
-    const prev = sparklineData[sparklineData.length - 2]
+    const prev = sparklineData[0]
     const delta = latest - prev
     const pct = prev > 0 ? Math.round((delta / prev) * 100) : 0
     const up = delta >= 0
@@ -127,6 +127,7 @@ function StatTile({ label, value, chip, chipColor, chipBg, onClick, sparklineDat
             {chip}
           </div>
         )}
+        {trendChip && <span style={{ fontSize: 10, color: '#94a3b8', whiteSpace: 'nowrap' }}>mentions vs last week</span>}
       </div>
       {sparklineData && sparklineData.length >= 2 && (
         <>
@@ -151,7 +152,7 @@ interface SocialMentionsTileProps {
 function SocialMentionsTile({ value, sparklineData, sparklineColor }: SocialMentionsTileProps) {
   const data = sparklineData
   const latest = data[data.length - 1]
-  const prev = data[data.length - 2]
+  const prev = data[0]
   const delta = latest - prev
   const pct = prev > 0 ? Math.round((delta / prev) * 100) : 0
   const trendUp = delta >= 0
@@ -172,6 +173,7 @@ function SocialMentionsTile({ value, sparklineData, sparklineColor }: SocialMent
         }}>
           {trendUp ? '+' : ''}{pct}%
         </span>
+        <span style={{ fontSize: 10, color: '#94a3b8', whiteSpace: 'nowrap' }}>mentions vs last week</span>
       </div>
       <MiniSparkline data={sparklineData} color={sparklineColor} width={200} height={48} fullWidth />
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
@@ -192,8 +194,13 @@ interface SentimentBreakdownTileProps {
 function SentimentBreakdownTile({ negPct, neutPct, posPct }: SentimentBreakdownTileProps) {
   return (
     <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '20px 20px', display: 'flex', flexDirection: 'column', gap: 0 }}>
-      <div style={{ fontSize: 11, fontWeight: 500, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 14 }}>
-        Avg Sentiment
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 500, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Avg Sentiment
+        </div>
+        <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 3 }}>
+          Across all social mentions this week
+        </div>
       </div>
       {/* Distribution bar */}
       <div style={{ display: 'flex', height: 6, borderRadius: 9999, overflow: 'hidden', gap: 1, marginBottom: 14 }}>
@@ -376,9 +383,16 @@ function SingleChannelSparkline({ rows, channelKey, color, label, width = 200, h
   ].join(' ')
 
   const latest = data[data.length - 1]
-  const prev = data[data.length - 2]
+  const prev = data[0]
   const delta = latest - prev
   const pct = prev > 0 ? Math.round((delta / prev) * 100) : 0
+
+  const peakIdx = data.indexOf(max)
+  const peakX = toX(peakIdx)
+  const peakY = toY(max)
+  const labels = (startLabel && endLabel)
+    ? rows.map(r => r.day)
+    : DAY_LABELS
 
   return (
     <div style={{
@@ -395,12 +409,12 @@ function SingleChannelSparkline({ rows, channelKey, color, label, width = 200, h
           <div style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
           <span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>{label}</span>
         </div>
-        <span style={{
-          fontSize: 11, fontWeight: 600,
-          color: delta >= 0 ? '#dc2626' : '#16a34a',
-        }}>
-          {delta >= 0 ? '+' : ''}{pct}%
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: delta >= 0 ? '#dc2626' : '#16a34a' }}>
+            {delta >= 0 ? '+' : ''}{pct}%
+          </span>
+          <span style={{ fontSize: 9, color: '#94a3b8' }}>vs last week</span>
+        </div>
       </div>
       <div style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>
         {latest.toLocaleString()}
@@ -411,9 +425,16 @@ function SingleChannelSparkline({ rows, channelKey, color, label, width = 200, h
         <polyline points={pts} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
         <circle cx={toX(data.length - 1)} cy={toY(latest)} r={3} fill={color} />
       </svg>
+      {/* Day-wise volume labels */}
       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-        <span style={{ fontSize: 9, color: '#64748b' }}>{startLabel ?? DAY_LABELS[0]}</span>
-        <span style={{ fontSize: 9, color: '#64748b' }}>{endLabel ?? DAY_LABELS[DAY_LABELS.length - 1]}</span>
+        {data.map((v, i) => (
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+            <span style={{ fontSize: 8, color: '#94a3b8', lineHeight: 1, marginBottom: 1 }}>{v.toLocaleString()}</span>
+            <span style={{ fontSize: 8, color: '#64748b', fontWeight: i === peakIdx ? 700 : 400 }}>
+              {labels[i] ? labels[i].split(' ')[0] : ''}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   )
